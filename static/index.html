@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>多维度追踪看板</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            padding-top: 50px;
+            overflow-x: hidden;
+        }
+
+        /* 顶部导航栏 - 合并标题 */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            padding: 8px 0;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            padding: 0 20px;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .nav-title {
+            font-size: 18px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .board-title-nav {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            padding: 4px 0;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-button {
+            padding: 8px 18px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #e8e8e8;
+            color: #666;
+            position: relative;
+        }
+
+        .nav-button:hover {
+            color: #16a34a;
+            background: rgba(34, 197, 94, 0.15);
+        }
+
+        .nav-button.active {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+        }
+
+        .nav-button.active:hover {
+            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+            box-shadow: 0 6px 16px rgba(34, 197, 94, 0.4);
+            transform: translateY(-1px);
+        }
+
+        /* 页面容器 */
+        .page {
+            display: none;
+            padding: 12px;
+            height: calc(100vh - 50px);
+            overflow: hidden;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            height: 100%; /* 确保容器占满父元素高度 */
+        }
+
+        .board-section {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .board-content {
+            display: grid;
+            grid-template-columns: 260px 1fr 260px;
+            gap: 12px;
+            margin-bottom: 0;
+            flex: 1;
+            min-height: 0; /* 关键：允许 grid item 缩小 */
+        }
+
+        .input-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            overflow: hidden; /* 防止内容溢出 */
+        }
+
+        .center-panel {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: #fafafa;
+            border-radius: 8px;
+            padding: 15px;
+            position: relative;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .center-panel canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 12px;
+            text-align: center;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #ddd;
+            flex-shrink: 0;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 12px;
+            text-align: center;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #ddd;
+            flex-shrink: 0;
+        }
+
+        .input-section {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 8px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .input-section.full-height {
+            flex: 1;
+            height: 100%;
+        }
+
+        .stats-section {
+            flex-shrink: 0;
+        }
+
+        .form-group {
+            margin-bottom: 8px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 4px;
+            color: #444;
+            font-weight: 600;
+            font-size: 12px;
+            line-height: 1.3;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 6px 10px;
+            border: 1.5px solid #ddd;
+            border-radius: 5px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .dimension-inputs {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 6px;
+        }
+
+        .dimension-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            padding: 6px 10px;
+            border-radius: 5px;
+            border: 1px solid #eee;
+        }
+
+        .dimension-item label {
+            flex: 1;
+            font-size: 12px;
+            font-weight: 600;
+            color: #333;
+            margin: 0;
+            line-height: 1.3;
+        }
+
+        .dimension-item input {
+            width: 60px;
+            padding: 4px 8px;
+            border: 1.5px solid #ddd;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .dimension-item input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .records-section {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 8px;
+            overflow-y: auto;
+            flex: 1; /* 占据右列剩余空间 */
+            display: flex;
+            flex-direction: column;
+            margin-top: 10px;
+            min-height: 0; /* 允许收缩 */
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* 强制双列 */
+            gap: 8px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 6px;
+            border-radius: 5px;
+            text-align: center;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .stat-card:hover {
+            background: #f0f4ff;
+            border-color: #667eea;
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(102, 126, 234, 0.2);
+        }
+
+        /* 折线图模态框 */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 80vh;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+            padding: 0 5px;
+            line-height: 1;
+        }
+
+        .modal-close:hover {
+            color: #333;
+        }
+
+        .modal-chart {
+            height: 350px;
+        }
+
+        .stat-label {
+            font-size: 12.3px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 4px;
+            line-height: 1.2;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .stat-change {
+            font-size: 11px;
+            margin-top: 4px;
+        }
+
+        .stat-change.positive {
+            color: #10b981;
+        }
+
+        .stat-change.negative {
+            color: #ef4444;
+        }
+
+        .stat-change.neutral {
+            color: #666;
+        }
+
+        .records-list {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #e0e0e0;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            max-height: 120px;
+        }
+
+        .records-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #333;
+        }
+
+        .records-container {
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .record-item {
+            background: white;
+            padding: 6px 8px;
+            border-radius: 4px;
+            margin-bottom: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid #eee;
+            flex-wrap: nowrap;
+            transition: all 0.2s;
+        }
+
+        .record-item .record-content {
+            cursor: pointer;
+        }
+
+        .record-item:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .record-item.selected {
+            border-color: #667eea;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+        }
+
+        .record-item.selected .record-date {
+            color: #667eea;
+        }
+
+        .record-content {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .record-summary {
+            font-size: 11px;
+            color: #666;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .record-date {
+            font-weight: 600;
+            color: #333;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        .record-values {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: 4px;
+        }
+
+        .record-dimension {
+            font-size: 11px;
+            color: #666;
+            background: #f0f0f0;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+
+        .record-dimension span {
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .btn-delete {
+            background: #ef4444;
+            color: white;
+            padding: 4px 10px;
+            font-size: 11px;
+            flex-shrink: 0;
+            width: auto !important;
+            margin-top: 0 !important;
+            border-radius: 4px;
+        }
+
+        .btn-delete:hover {
+            background: #dc2626;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        /* 按钮样式 */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+            box-shadow: 0 6px 16px rgba(34, 197, 94, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 - 合并标题 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-left">
+                <div class="nav-title">多维度追踪看板</div>
+                <div class="board-title-nav" id="current-board-title">边界感六维</div>
+            </div>
+            <div class="nav-buttons">
+                <button class="nav-button active" onclick="switchPage(1)">边界感六维</button>
+                <button class="nav-button" onclick="switchPage(2)">2026找工作八维</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 页面1：边界感六维 -->
+    <div class="page active" id="page-1">
+        <div class="container">
+            <div class="board-section" id="board-1">
+                <div class="board-content">
+                    
+                    <!-- 左列：每日记录 -->
+                    <div class="input-panel">
+                        <div class="input-section full-height">
+                            <div class="section-title">每日记录</div>
+                            <form id="form-board-1">
+                                <div class="form-group">
+                                    <label>日期</label>
+                                    <input type="date" id="date-board-1" required>
+                                </div>
+                                <div class="dimension-inputs" id="dimensions-board-1">
+                                    <!-- 动态生成维度输入框 -->
+                                </div>
+                                <button type="submit" class="btn btn-primary">保存记录</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- 中列：雷达图 -->
+                    <div class="center-panel">
+                        <canvas id="chart-board-1"></canvas>
+                    </div>
+
+                    <!-- 右列：统计 + 历史记录 -->
+                    <div class="right-panel">
+                        <div class="stats-section">
+                            <div class="section-title">本周统计</div>
+                            <div class="stats-grid" id="stats-board-1">
+                                <!-- 动态生成统计卡片 -->
+                            </div>
+                        </div>
+                        <div class="records-section">
+                            <div class="section-title">历史记录</div>
+                            <div class="records-container" id="records-board-1">
+                                <div class="loading">加载中...</div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 页面2：2026找工作八维 -->
+    <div class="page" id="page-2">
+        <div class="container">
+            <div class="board-section" id="board-2">
+                <div class="board-content">
+                    
+                    <!-- 左列：每日记录 -->
+                    <div class="input-panel">
+                        <div class="input-section full-height">
+                            <div class="section-title">每日记录</div>
+                            <form id="form-board-2">
+                                <div class="form-group">
+                                    <label>日期</label>
+                                    <input type="date" id="date-board-2" required>
+                                </div>
+                                <div class="dimension-inputs" id="dimensions-board-2">
+                                    <!-- 动态生成维度输入框 -->
+                                </div>
+                                <button type="submit" class="btn btn-primary">保存记录</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- 中列：雷达图 -->
+                    <div class="center-panel">
+                        <canvas id="chart-board-2"></canvas>
+                    </div>
+
+                    <!-- 右列：统计 + 历史记录 -->
+                    <div class="right-panel">
+                        <div class="stats-section">
+                            <div class="section-title">本周统计</div>
+                            <div class="stats-grid" id="stats-board-2">
+                                <!-- 动态生成统计卡片 -->
+                            </div>
+                        </div>
+                        <div class="records-section">
+                            <div class="section-title">历史记录</div>
+                            <div class="records-container" id="records-board-2">
+                                <div class="loading">加载中...</div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+</div>
+
+<script>
+        // API 基础URL
+        const API_BASE = '';
+
+        // 存储看板数据
+        let boards = [];
+        let charts = {};
+
+        // 页面切换函数
+        function switchPage(pageNum) {
+            // 隐藏所有页面
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+
+            // 显示选中的页面
+            document.getElementById(`page-${pageNum}`).classList.add('active');
+
+            // 更新导航按钮状态
+            document.querySelectorAll('.nav-button').forEach((btn, index) => {
+                if (index === pageNum - 1) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            // 更新导航栏中的看板标题
+            const titles = ['边界感六维', '2026找工作八维'];
+            document.getElementById('current-board-title').textContent = titles[pageNum - 1];
+
+            // 触发图表动画重播
+            // 获取当前页面的看板ID（假设顺序为 board-1, board-2... 与 pageNum 对应）
+            // 注意：这里假设 boards 数组顺序与页面顺序一致
+            if (boards.length >= pageNum) {
+                const boardId = boards[pageNum - 1].id;
+                const chart = charts[boardId];
+                if (chart) {
+                    // 稍微延迟一下，确保页面 visible 后再重播动画
+                    setTimeout(() => {
+                        chart.reset();
+                        chart.update();
+                    }, 50);
+                }
+            }
+        }
+
+        // 初始化应用
+        async function init() {
+            try {
+                // 加载看板列表
+                const response = await fetch(`${API_BASE}/boards`);
+                boards = await response.json();
+                
+                // 为每个看板初始化
+                for (let i = 0; i < boards.length; i++) {
+                    const board = boards[i];
+                    await initBoard(board, i + 1);
+                }
+            } catch (error) {
+                console.error('初始化失败:', error);
+                showError('加载数据失败，请刷新页面重试');
+            }
+        }
+
+        // 初始化单个看板
+        async function initBoard(board, index) {
+            const boardId = board.id;
+            const boardPrefix = `board-${index}`;
+
+            // 设置默认日期为今天
+            const dateInput = document.getElementById(`date-${boardPrefix}`);
+            if (dateInput) {
+                dateInput.value = new Date().toISOString().split('T')[0];
+            }
+
+            // 生成维度输入框（优化排版：标签和输入框在同一行）
+            const dimensionsContainer = document.getElementById(`dimensions-${boardPrefix}`);
+            dimensionsContainer.innerHTML = '';
+            board.dimensions.forEach(dim => {
+                const div = document.createElement('div');
+                div.className = 'dimension-item';
+                div.innerHTML = `
+                    <label>${dim}</label>
+                    <input type="number" 
+                           min="0" 
+                           max="10" 
+                           step="1" 
+                           data-dimension="${dim}" 
+                           placeholder="0-10"
+                           required>
+                `;
+                dimensionsContainer.appendChild(div);
+            });
+
+            // 绑定表单提交事件
+            const form = document.getElementById(`form-${boardPrefix}`);
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await saveRecord(boardId, boardPrefix);
+            });
+
+            // 初始化雷达图
+            initChart(board, boardPrefix);
+
+            // 加载统计数据
+            await loadWeeklyStats(boardId, boardPrefix);
+
+            // 加载历史记录
+            await loadRecords(boardId, boardPrefix);
+        }
+
+        // 保存记录
+        async function saveRecord(boardId, boardPrefix) {
+            try {
+                const dateInput = document.getElementById(`date-${boardPrefix}`);
+                const dimensionInputs = document.querySelectorAll(`#dimensions-${boardPrefix} input[data-dimension]`);
+                
+                const values = {};
+                dimensionInputs.forEach(input => {
+                    const dim = input.getAttribute('data-dimension');
+                    values[dim] = parseFloat(input.value) || 0;
+                });
+
+                const recordData = {
+                    board_id: boardId,
+                    record_date: dateInput.value,
+                    values: values
+                };
+
+                const response = await fetch(`${API_BASE}/records`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(recordData)
+                });
+
+                if (response.ok) {
+                    alert('记录保存成功！');
+                    // 重新加载数据和图表
+                    await loadWeeklyStats(boardId, boardPrefix);
+                    await loadRecords(boardId, boardPrefix);
+                    updateChart(boardId, boardPrefix);
+                } else {
+                    throw new Error('保存失败');
+                }
+            } catch (error) {
+                console.error('保存记录失败:', error);
+                alert('保存失败，请重试');
+            }
+        }
+
+        // 初始化雷达图
+        function initChart(board, boardPrefix) {
+            const ctx = document.getElementById(`chart-${boardPrefix}`);
+            if (!ctx) return;
+
+            charts[board.id] = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: board.dimensions,
+                    datasets: [
+                        {
+                            label: '本周平均值',
+                            data: board.dimensions.map(() => 0),
+                            borderColor: 'rgb(102, 126, 234)',
+                            backgroundColor: 'rgba(102, 126, 234, 0.2)',
+                            pointBackgroundColor: 'rgb(102, 126, 234)',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgb(102, 126, 234)',
+                            borderWidth: 3,
+                            pointRadius: 5,
+                            pointHoverRadius: 7
+                        },
+                        {
+                            label: '上周平均值',
+                            data: board.dimensions.map(() => 0),
+                            borderColor: 'rgb(239, 68, 68)',
+                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                            pointBackgroundColor: 'rgb(239, 68, 68)',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgb(239, 68, 68)',
+                            borderWidth: 2,
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            borderDash: [5, 5] // 虚线样式区分上周
+                        }
+                    ]
+                },
+                // 注册自定义插件：智能显示数值标签
+                plugins: [{
+                    id: 'dataLabels',
+                    afterDatasetsDraw(chart, args, options) {
+                        const { ctx, data } = chart;
+                        
+                        // 获取两个数据集的可见性
+                        const blueVisible = chart.isDatasetVisible(0);
+                        const redVisible = chart.isDatasetVisible(1);
+                        
+                        // 判断显示哪个数据集的数字
+                        let targetDatasetIndex = -1;
+                        let labelColor = '';
+                        
+                        if (blueVisible && redVisible) {
+                            // 两个都显示时，只显示蓝色（本周）的数字
+                            targetDatasetIndex = 0;
+                            labelColor = '#667eea';
+                        } else if (blueVisible && !redVisible) {
+                            // 只有蓝色显示
+                            targetDatasetIndex = 0;
+                            labelColor = '#667eea';
+                        } else if (!blueVisible && redVisible) {
+                            // 只有红色显示
+                            targetDatasetIndex = 1;
+                            labelColor = '#ef4444';
+                        }
+                        // 如果两个都隐藏，不显示任何数字
+                        
+                        if (targetDatasetIndex === -1) return;
+                        
+                        const dataset = data.datasets[targetDatasetIndex];
+                        const meta = chart.getDatasetMeta(targetDatasetIndex);
+                        
+                        ctx.save();
+                        ctx.font = 'bold 16px "Microsoft YaHei", sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillStyle = labelColor;
+                        
+                        meta.data.forEach((point, index) => {
+                            const value = dataset.data[index];
+                            if (value !== undefined && value !== null && value > 0) {
+                                // 计算标注位置：稍微偏离点中心
+                                const angle = Math.atan2(point.y - chart.scales.r.yCenter, point.x - chart.scales.r.xCenter);
+                                const radius = 20;
+                                const x = point.x + Math.cos(angle) * radius;
+                                const y = point.y + Math.sin(angle) * radius;
+                                
+                                ctx.fillText(value.toFixed(1), x, y);
+                            }
+                        });
+                        ctx.restore();
+                    }
+                }],
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    layout: {
+                        padding: {
+                            top: 10,
+                            bottom: 10,
+                            left: 10,
+                            right: 10
+                        }
+                    },
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 10,
+                            ticks: {
+                                stepSize: 2,
+                                display: true,
+                                color: '#666',
+                                font: {
+                                    size: 10
+                                },
+                                backdropColor: 'rgba(255, 255, 255, 0.7)',
+                                showLabelBackdrop: true
+                            },
+                            grid: {
+                                color: 'rgba(102, 126, 234, 0.3)',
+                                lineWidth: 1.5,
+                                circular: true
+                            },
+                            angleLines: {
+                                color: 'rgba(102, 126, 234, 0.3)',
+                                lineWidth: 1.5
+                            },
+                            pointLabels: {
+                                font: {
+                                    size: 12,
+                                    weight: 'bold',
+                                    family: "'Microsoft YaHei', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial"
+                                },
+                                color: '#333',
+                                padding: 8
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 12,
+                                padding: 15,
+                                font: {
+                                    size: 12,
+                                    weight: 'bold'
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 更新雷达图（同时更新本周和上周数据）
+        async function updateChart(boardId, boardPrefix) {
+            try {
+                const stats = await fetch(`${API_BASE}/boards/${boardId}/weekly-stats`).then(r => r.json());
+                if (charts[boardId]) {
+                    // 本周数据
+                    charts[boardId].data.datasets[0].data = stats.averages ? 
+                        Object.values(stats.averages) : 
+                        charts[boardId].data.labels.map(() => 0);
+                    // 上周数据
+                    charts[boardId].data.datasets[1].data = stats.last_week_averages ? 
+                        Object.values(stats.last_week_averages) : 
+                        charts[boardId].data.labels.map(() => 0);
+                    charts[boardId].update();
+                }
+            } catch (error) {
+                console.error('更新图表失败:', error);
+            }
+        }
+
+        // 加载每周统计
+        async function loadWeeklyStats(boardId, boardPrefix) {
+            try {
+                const response = await fetch(`${API_BASE}/boards/${boardId}/weekly-stats`);
+                const stats = await response.json();
+
+                // 更新图表（本周 + 上周）
+                if (charts[boardId]) {
+                    // 本周数据（蓝色）
+                    charts[boardId].data.datasets[0].data = Object.values(stats.averages);
+                    // 上周数据（红色）
+                    if (stats.last_week_averages) {
+                        charts[boardId].data.datasets[1].data = Object.values(stats.last_week_averages);
+                    } else {
+                        charts[boardId].data.datasets[1].data = charts[boardId].data.labels.map(() => 0);
+                    }
+                    charts[boardId].update();
+                }
+
+                // 显示统计卡片
+                const statsContainer = document.getElementById(`stats-${boardPrefix}`);
+                statsContainer.innerHTML = '';
+
+                const board = boards.find(b => b.id === boardId);
+                board.dimensions.forEach(dim => {
+                    const avg = stats.averages[dim] || 0;
+                    const change = stats.changes ? stats.changes[dim] : null;
+
+                    const card = document.createElement('div');
+                    card.className = 'stat-card';
+                    card.title = '点击查看趋势';
+                    card.onclick = () => showDimensionHistory(boardId, dim);
+                    
+                    let changeHtml = '';
+                    if (change !== null) {
+                        const changeClass = change > 0 ? 'positive' : change < 0 ? 'negative' : 'neutral';
+                        const changeSymbol = change > 0 ? '+' : '';
+                        changeHtml = `<div class="stat-change ${changeClass}">${changeSymbol}${change.toFixed(1)} vs 上周</div>`;
+                    }
+
+                    card.innerHTML = `
+                        <div class="stat-label">${dim}</div>
+                        <div class="stat-value">${avg.toFixed(1)}</div>
+                        ${changeHtml}
+                    `;
+                    statsContainer.appendChild(card);
+                });
+            } catch (error) {
+                console.error('加载统计失败:', error);
+            }
+        }
+
+        // 加载历史记录
+        async function loadRecords(boardId, boardPrefix) {
+            try {
+                const response = await fetch(`${API_BASE}/records?board_id=${boardId}`);
+                const records = await response.json();
+
+                const recordsContainer = document.getElementById(`records-${boardPrefix}`);
+                
+                if (records.length === 0) {
+                    recordsContainer.innerHTML = '<div class="loading">暂无记录</div>';
+                    return;
+                }
+
+                recordsContainer.innerHTML = '';
+                records.forEach(record => {
+                    const item = document.createElement('div');
+                    item.className = 'record-item';
+                    item.dataset.recordId = record.id;
+                    
+                    const dateStr = new Date(record.record_date).toLocaleDateString('zh-CN');
+                    // 计算平均值作为摘要
+                    const values = Object.values(record.values);
+                    const avg = values.length > 0 ? (values.reduce((a, b) => a + b, 0) / values.length).toFixed(1) : 0;
+
+                    item.innerHTML = `
+                        <div class="record-content" onclick="toggleRecordChart(${boardId}, '${boardPrefix}', ${JSON.stringify(record.values).replace(/"/g, '&quot;')}, '${dateStr}', this.parentElement)">
+                            <span class="record-date">${dateStr}</span>
+                            <span class="record-summary">均值: ${avg}</span>
+                        </div>
+                        <button class="btn btn-delete" onclick="event.stopPropagation(); deleteRecord(${record.id}, ${boardId}, '${boardPrefix}')">删除</button>
+                    `;
+                    recordsContainer.appendChild(item);
+                });
+            } catch (error) {
+                console.error('加载记录失败:', error);
+                document.getElementById(`records-${boardPrefix}`).innerHTML = 
+                    '<div class="error">加载记录失败</div>';
+            }
+        }
+
+        // 删除记录
+        async function deleteRecord(recordId, boardId, boardPrefix) {
+            if (!confirm('确定要删除这条记录吗？')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/records/${recordId}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    await loadWeeklyStats(boardId, boardPrefix);
+                    await loadRecords(boardId, boardPrefix);
+                    updateChart(boardId, boardPrefix);
+                } else {
+                    throw new Error('删除失败');
+                }
+            } catch (error) {
+                console.error('删除记录失败:', error);
+                alert('删除失败，请重试');
+            }
+        }
+
+        // 显示错误信息
+        function showError(message) {
+            const container = document.querySelector('.container');
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error';
+            errorDiv.textContent = message;
+            container.insertBefore(errorDiv, container.firstChild);
+        }
+
+        // 存储原始图表数据和当前选中的记录
+        let originalChartData = {};
+        let selectedRecordElement = null;
+
+        // 切换显示单条记录的雷达图
+        function toggleRecordChart(boardId, boardPrefix, recordValues, dateStr, itemElement) {
+            const chart = charts[boardId];
+            if (!chart) return;
+
+            // 如果点击的是当前选中的记录，恢复原始图表
+            if (selectedRecordElement === itemElement) {
+                restoreOriginalChart(boardId);
+                itemElement.classList.remove('selected');
+                selectedRecordElement = null;
+                return;
+            }
+
+            // 如果有其他选中的记录，先取消选中
+            if (selectedRecordElement) {
+                selectedRecordElement.classList.remove('selected');
+            }
+
+            // 保存原始数据（如果还没保存）
+            if (!originalChartData[boardId]) {
+                originalChartData[boardId] = {
+                    data0: [...chart.data.datasets[0].data],
+                    data1: [...chart.data.datasets[1].data],
+                    label0: chart.data.datasets[0].label,
+                    label1: chart.data.datasets[1].label
+                };
+            }
+
+            // 更新图表显示单条记录
+            const board = boards.find(b => b.id === boardId);
+            const recordData = board.dimensions.map(dim => recordValues[dim] || 0);
+            
+            chart.data.datasets[0].data = recordData;
+            chart.data.datasets[0].label = dateStr + ' 记录';
+            chart.data.datasets[1].data = board.dimensions.map(() => 0); // 隐藏上周数据
+            chart.data.datasets[1].label = '';
+            
+            chart.update();
+
+            // 标记选中状态
+            itemElement.classList.add('selected');
+            selectedRecordElement = itemElement;
+        }
+
+        // 恢复原始图表
+        function restoreOriginalChart(boardId) {
+            const chart = charts[boardId];
+            if (!chart || !originalChartData[boardId]) return;
+
+            chart.data.datasets[0].data = originalChartData[boardId].data0;
+            chart.data.datasets[0].label = originalChartData[boardId].label0;
+            chart.data.datasets[1].data = originalChartData[boardId].data1;
+            chart.data.datasets[1].label = originalChartData[boardId].label1;
+            
+            chart.update();
+            delete originalChartData[boardId];
+        }
+
+        // 点击其他地方恢复图表
+        document.addEventListener('click', function(e) {
+            if (selectedRecordElement && !e.target.closest('.record-item')) {
+                const boardId = Object.keys(originalChartData)[0];
+                if (boardId) {
+                    restoreOriginalChart(parseInt(boardId));
+                    selectedRecordElement.classList.remove('selected');
+                    selectedRecordElement = null;
+                }
+            }
+        });
+
+        // ==================== 折线图模态框功能 ====================
+        let lineChart = null;
+
+        // 显示维度历史折线图
+        async function showDimensionHistory(boardId, dimension) {
+            try {
+                const response = await fetch(`${API_BASE}/boards/${boardId}/dimension-history?dimension=${encodeURIComponent(dimension)}&weeks=8`);
+                const data = await response.json();
+
+                // 显示模态框
+                const modal = document.getElementById('line-chart-modal');
+                modal.classList.add('active');
+                document.getElementById('modal-dimension-title').textContent = dimension + ' - 周平均值趋势';
+
+                // 准备图表数据
+                const labels = data.history.map(h => h.week_label);
+                const values = data.history.map(h => h.average);
+
+                // 销毁旧图表
+                if (lineChart) {
+                    lineChart.destroy();
+                }
+
+                // 创建新图表
+                const ctx = document.getElementById('line-chart-canvas');
+                lineChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: dimension,
+                            data: values,
+                            borderColor: 'rgb(102, 126, 234)',
+                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                            borderWidth: 3,
+                            pointBackgroundColor: 'rgb(102, 126, 234)',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            pointRadius: 6,
+                            pointHoverRadius: 8,
+                            fill: true,
+                            tension: 0.3
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 10,
+                                ticks: {
+                                    stepSize: 2,
+                                    font: { size: 12, weight: 'bold' }
+                                },
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.1)'
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    font: { size: 12, weight: 'bold' }
+                                },
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                titleFont: { size: 14 },
+                                bodyFont: { size: 14 },
+                                padding: 12,
+                                callbacks: {
+                                    label: function(context) {
+                                        return '周平均: ' + context.raw.toFixed(1);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('加载维度历史失败:', error);
+                alert('加载数据失败，请重试');
+            }
+        }
+
+        // 关闭模态框
+        function closeModal() {
+            const modal = document.getElementById('line-chart-modal');
+            modal.classList.remove('active');
+            if (lineChart) {
+                lineChart.destroy();
+                lineChart = null;
+            }
+        }
+
+        // 点击模态框背景关闭
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('modal-overlay')) {
+                closeModal();
+            }
+        });
+
+        // ESC 键关闭模态框
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', init);
+</script>
+
+<!-- 折线图模态框 -->
+<div class="modal-overlay" id="line-chart-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div class="modal-title" id="modal-dimension-title">维度趋势</div>
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-chart">
+            <canvas id="line-chart-canvas"></canvas>
+        </div>
+    </div>
+</div>
+</body>
+</html>
