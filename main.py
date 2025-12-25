@@ -1,8 +1,17 @@
 from fastapi import FastAPI, Depends, HTTPException
-from sqlalchemy import create_engine, Column, Integer, String, Date, JSON
+from sqlalchemy import (
+    create_engine,
+    Column,
+    Integer,
+    String,
+    Date,
+    JSON,
+    Boolean,
+    DateTime,
+)
 from sqlalchemy.orm import declarative_base, sessionmaker, Session
 from pydantic import BaseModel, ConfigDict
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from typing import Dict, List, Optional
 
 from fastapi.staticfiles import StaticFiles
@@ -23,6 +32,8 @@ class Board(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, unique=True, index=True)  # 看板名称，如"边界感六维"
     dimensions = Column(JSON)  # 维度列表，如 ["维度1", "维度2", ...]
+    is_deleted = Column(Boolean, default=False)  # 软删除标记
+    deleted_at = Column(DateTime, nullable=True)  # 删除时间
 
 
 class DailyRecord(Base):
@@ -63,6 +74,8 @@ class BoardResponse(BaseModel):
     id: int
     name: str
     dimensions: List[str]
+    is_deleted: Optional[bool] = False
+    deleted_at: Optional[datetime] = None
 
 
 class DailyRecordCreate(BaseModel):
@@ -144,9 +157,15 @@ def init_boards(db: Session):
 
 @app.get("/boards", response_model=List[BoardResponse])
 def get_boards(db: Session = Depends(get_db)):
-    """获取所有看板"""
+    """获取所有未删除的看板"""
     init_boards(db)  # 确保看板已初始化
-    return db.query(Board).all()
+    return db.query(Board).filter(Board.is_deleted.is_(False)).all()
+
+
+@app.get("/boards/deleted/list", response_model=List[BoardResponse])
+def get_deleted_boards(db: Session = Depends(get_db)):
+    """获取所有已删除的看板"""
+    return db.query(Board).filter(Board.is_deleted.is_(True)).all()
 
 
 @app.get("/boards/{board_id}", response_model=BoardResponse)
@@ -156,6 +175,74 @@ def get_board(board_id: int, db: Session = Depends(get_db)):
     if not board:
         raise HTTPException(status_code=404, detail="看板不存在")
     return board
+
+
+@app.post("/boards", response_model=BoardResponse)
+def create_board(board: BoardCreate, db: Session = Depends(get_db)):
+    """创建新看板"""
+    # 检查名称是否已存在
+    existing = db.query(Board).filter(Board.name == board.name).first()
+    if existing:
+        if existing.is_deleted:
+            # 如果是已删除的同名看板，恢复并更新维度
+            existing.is_deleted = False
+            existing.deleted_at = None
+            existing.dimensions = board.dimensions
+            db.commit()
+            db.refresh(existing)
+            return existing
+        raise HTTPException(status_code=400, detail="看板名称已存在")
+
+    db_board = Board(name=board.name, dimensions=board.dimensions, is_deleted=False)
+    db.add(db_board)
+    db.commit()
+    db.refresh(db_board)
+    return db_board
+
+
+@app.delete("/boards/{board_id}")
+def delete_board(board_id: int, db: Session = Depends(get_db)):
+    """软删除看板"""
+    board = db.query(Board).filter(Board.id == board_id).first()
+    if not board:
+        raise HTTPException(status_code=404, detail="看板不存在")
+    if board.is_deleted:
+        raise HTTPException(status_code=400, detail="看板已被删除")
+
+    board.is_deleted = True
+    board.deleted_at = datetime.now()
+    db.commit()
+    return {"status": "success", "message": "看板已移至最近删除"}
+
+
+@app.post("/boards/{board_id}/restore")
+def restore_board(board_id: int, db: Session = Depends(get_db)):
+    """恢复已删除的看板"""
+    board = db.query(Board).filter(Board.id == board_id).first()
+    if not board:
+        raise HTTPException(status_code=404, detail="看板不存在")
+    if not board.is_deleted:
+        raise HTTPException(status_code=400, detail="看板未被删除")
+
+    board.is_deleted = False
+    board.deleted_at = None
+    db.commit()
+    return {"status": "success", "message": "看板已恢复"}
+
+
+@app.delete("/boards/{board_id}/permanent")
+def permanent_delete_board(board_id: int, db: Session = Depends(get_db)):
+    """永久删除看板及其所有记录"""
+    board = db.query(Board).filter(Board.id == board_id).first()
+    if not board:
+        raise HTTPException(status_code=404, detail="看板不存在")
+
+    # 删除该看板的所有记录
+    db.query(DailyRecord).filter(DailyRecord.board_id == board_id).delete()
+    # 删除看板
+    db.delete(board)
+    db.commit()
+    return {"status": "success", "message": "看板已永久删除"}
 
 
 @app.post("/records", response_model=DailyRecordResponse)
@@ -391,6 +478,51 @@ app.mount("/", StaticFiles(directory="static", html=True), name="static")
 
 # ==================== 启动服务器 ====================
 if __name__ == "__main__":
+    import subprocess
+    import sys
+
     import uvicorn
 
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    def is_port_in_use(port: int) -> int | None:
+        """检查端口是否被占用，返回占用进程的 PID，未占用返回 None"""
+        try:
+            result = subprocess.run(
+                ["netstat", "-ano"],
+                capture_output=True,
+                text=True,
+                creationflags=subprocess.CREATE_NO_WINDOW,
+            )
+            for line in result.stdout.splitlines():
+                if f"127.0.0.1:{port}" in line and "LISTENING" in line:
+                    parts = line.split()
+                    return int(parts[-1])
+        except Exception:
+            pass
+        return None
+
+    def kill_process(pid: int) -> bool:
+        """杀死指定 PID 的进程"""
+        try:
+            subprocess.run(
+                ["taskkill", "/PID", str(pid), "/F"],
+                capture_output=True,
+                creationflags=subprocess.CREATE_NO_WINDOW,
+            )
+            return True
+        except Exception:
+            return False
+
+    port = 8000
+    pid = is_port_in_use(port)
+    if pid:
+        print(f"⚠️  端口 {port} 被进程 {pid} 占用，正在尝试释放...")
+        if kill_process(pid):
+            print(f"✅ 已终止进程 {pid}")
+            import time
+
+            time.sleep(0.5)  # 等待端口释放
+        else:
+            print(f"❌ 无法终止进程 {pid}，请手动处理")
+            sys.exit(1)
+
+    uvicorn.run(app, host="127.0.0.1", port=port)

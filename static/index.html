@@ -37,13 +37,16 @@
             max-width: 1400px;
             margin: 0 auto;
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
             gap: 20px;
             padding: 0 20px;
+            position: relative;
         }
 
         .nav-left {
+            position: absolute;
+            left: 20px;
             display: flex;
             align-items: center;
             gap: 15px;
@@ -559,6 +562,395 @@
             transform: translateY(0);
             box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
         }
+
+        /* 管理图标按钮 */
+        .nav-manage-btn {
+            position: absolute;
+            right: 20px;
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: #f0f0f0;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .nav-manage-btn:hover {
+            background: rgba(34, 197, 94, 0.15);
+        }
+
+        .nav-manage-btn svg {
+            width: 20px;
+            height: 20px;
+            stroke: #666;
+            transition: stroke 0.3s;
+        }
+
+        .nav-manage-btn:hover svg {
+            stroke: #16a34a;
+        }
+
+        /* 管理面板模态框 */
+        .manage-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 3000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .manage-modal.active {
+            display: flex;
+        }
+
+        .manage-panel {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .manage-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .manage-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .manage-close {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: #f5f5f5;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 20px;
+            color: #666;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .manage-close:hover {
+            background: #ef4444;
+            color: white;
+        }
+
+        .manage-tabs {
+            display: flex;
+            border-bottom: 1px solid #eee;
+            padding: 0 24px;
+        }
+
+        .manage-tab {
+            padding: 12px 20px;
+            border: none;
+            background: none;
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+            cursor: pointer;
+            position: relative;
+            transition: color 0.3s;
+        }
+
+        .manage-tab:hover {
+            color: #16a34a;
+        }
+
+        .manage-tab.active {
+            color: #16a34a;
+        }
+
+        .manage-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 20px;
+            right: 20px;
+            height: 2px;
+            background: #16a34a;
+            border-radius: 2px 2px 0 0;
+        }
+
+        .manage-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 24px;
+        }
+
+        .manage-section {
+            display: none;
+        }
+
+        .manage-section.active {
+            display: block;
+        }
+
+        /* 看板列表样式 */
+        .board-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .board-item {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 1px solid #eee;
+            transition: all 0.2s;
+        }
+
+        .board-item:hover {
+            border-color: #16a34a;
+            box-shadow: 0 2px 8px rgba(34, 197, 94, 0.15);
+        }
+
+        .board-item-info {
+            flex: 1;
+        }
+
+        .board-item-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .board-item-dims {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .board-item-deleted-at {
+            font-size: 11px;
+            color: #ef4444;
+            margin-top: 4px;
+        }
+
+        .board-item-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .board-item-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .board-item-btn.delete {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .board-item-btn.delete:hover {
+            background: #ef4444;
+            color: white;
+        }
+
+        .board-item-btn.restore {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .board-item-btn.restore:hover {
+            background: #22c55e;
+            color: white;
+        }
+
+        .board-item-btn.permanent {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .board-item-btn.permanent:hover {
+            background: #f59e0b;
+            color: white;
+        }
+
+        /* 创建看板表单 */
+        .create-form {
+            margin-bottom: 24px;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.05) 0%, rgba(22, 163, 74, 0.05) 100%);
+            border-radius: 12px;
+            border: 1px dashed #22c55e;
+        }
+
+        .create-form-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #16a34a;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .create-form-group {
+            margin-bottom: 16px;
+        }
+
+        .create-form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 6px;
+        }
+
+        .create-form-input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1.5px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .create-form-input:focus {
+            outline: none;
+            border-color: #22c55e;
+        }
+
+        .dimension-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .dimension-tag {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            font-size: 13px;
+            color: #333;
+        }
+
+        .dimension-tag-remove {
+            width: 16px;
+            height: 16px;
+            border: none;
+            background: #ef4444;
+            color: white;
+            border-radius: 50%;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+
+        .add-dimension-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .add-dimension-row input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1.5px solid #ddd;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .add-dimension-row input:focus {
+            outline: none;
+            border-color: #22c55e;
+        }
+
+        .add-dimension-btn {
+            padding: 8px 16px;
+            background: #22c55e;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .add-dimension-btn:hover {
+            background: #16a34a;
+        }
+
+        .create-submit-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .create-submit-btn:hover {
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .create-submit-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #888;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .empty-state-text {
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
@@ -569,110 +961,20 @@
                 <div class="nav-title">多维度追踪看板</div>
                 <div class="board-title-nav" id="current-board-title">边界感六维</div>
             </div>
-            <div class="nav-buttons">
-                <button class="nav-button active" onclick="switchPage(1)">边界感六维</button>
-                <button class="nav-button" onclick="switchPage(2)">2026找工作八维</button>
+            <div class="nav-buttons" id="nav-buttons-container">
+                <!-- 动态生成看板按钮 -->
             </div>
+            <button class="nav-manage-btn" onclick="openManagePanel()" title="管理看板">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="4" y1="6" x2="20" y2="6"></line>
+                    <line x1="4" y1="12" x2="20" y2="12"></line>
+                    <line x1="4" y1="18" x2="20" y2="18"></line>
+                </svg>
+            </button>
         </div>
     </nav>
 
-    <!-- 页面1：边界感六维 -->
-    <div class="page active" id="page-1">
-        <div class="container">
-            <div class="board-section" id="board-1">
-                <div class="board-content">
-                    
-                    <!-- 左列：每日记录 -->
-                    <div class="input-panel">
-                        <div class="input-section full-height">
-                            <div class="section-title">每日记录</div>
-                            <form id="form-board-1">
-                                <div class="form-group">
-                                    <label>日期</label>
-                                    <input type="date" id="date-board-1" required>
-                                </div>
-                                <div class="dimension-inputs" id="dimensions-board-1">
-                                    <!-- 动态生成维度输入框 -->
-                                </div>
-                                <button type="submit" class="btn btn-primary">保存记录</button>
-                            </form>
-                        </div>
-                    </div>
-
-                    <!-- 中列：雷达图 -->
-                    <div class="center-panel">
-                        <canvas id="chart-board-1"></canvas>
-                    </div>
-
-                    <!-- 右列：统计 + 历史记录 -->
-                    <div class="right-panel">
-                        <div class="stats-section">
-                            <div class="section-title">本周统计</div>
-                            <div class="stats-grid" id="stats-board-1">
-                                <!-- 动态生成统计卡片 -->
-                            </div>
-                        </div>
-                        <div class="records-section">
-                            <div class="section-title">历史记录</div>
-                            <div class="records-container" id="records-board-1">
-                                <div class="loading">加载中...</div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 页面2：2026找工作八维 -->
-    <div class="page" id="page-2">
-        <div class="container">
-            <div class="board-section" id="board-2">
-                <div class="board-content">
-                    
-                    <!-- 左列：每日记录 -->
-                    <div class="input-panel">
-                        <div class="input-section full-height">
-                            <div class="section-title">每日记录</div>
-                            <form id="form-board-2">
-                                <div class="form-group">
-                                    <label>日期</label>
-                                    <input type="date" id="date-board-2" required>
-                                </div>
-                                <div class="dimension-inputs" id="dimensions-board-2">
-                                    <!-- 动态生成维度输入框 -->
-                                </div>
-                                <button type="submit" class="btn btn-primary">保存记录</button>
-                            </form>
-                        </div>
-                    </div>
-
-                    <!-- 中列：雷达图 -->
-                    <div class="center-panel">
-                        <canvas id="chart-board-2"></canvas>
-                    </div>
-
-                    <!-- 右列：统计 + 历史记录 -->
-                    <div class="right-panel">
-                        <div class="stats-section">
-                            <div class="section-title">本周统计</div>
-                            <div class="stats-grid" id="stats-board-2">
-                                <!-- 动态生成统计卡片 -->
-                            </div>
-                        </div>
-                        <div class="records-section">
-                            <div class="section-title">历史记录</div>
-                            <div class="records-container" id="records-board-2">
-                                <div class="loading">加载中...</div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-</div>
+    <!-- 动态生成的看板页面会插入到这里 -->
 
 <script>
         // API 基础URL
@@ -681,20 +983,28 @@
         // 存储看板数据
         let boards = [];
         let charts = {};
+        let currentPageIndex = 0;
+        let newDimensions = []; // 新建看板时的维度列表
 
         // 页面切换函数
-        function switchPage(pageNum) {
+        function switchPage(pageIndex) {
+            if (pageIndex < 0 || pageIndex >= boards.length) return;
+            currentPageIndex = pageIndex;
+
             // 隐藏所有页面
             document.querySelectorAll('.page').forEach(page => {
                 page.classList.remove('active');
             });
 
             // 显示选中的页面
-            document.getElementById(`page-${pageNum}`).classList.add('active');
+            const pageEl = document.getElementById(`page-${boards[pageIndex].id}`);
+            if (pageEl) {
+                pageEl.classList.add('active');
+            }
 
             // 更新导航按钮状态
-            document.querySelectorAll('.nav-button').forEach((btn, index) => {
-                if (index === pageNum - 1) {
+            document.querySelectorAll('#nav-buttons-container .nav-button').forEach((btn, index) => {
+                if (index === pageIndex) {
                     btn.classList.add('active');
                 } else {
                     btn.classList.remove('active');
@@ -702,23 +1012,96 @@
             });
 
             // 更新导航栏中的看板标题
-            const titles = ['边界感六维', '2026找工作八维'];
-            document.getElementById('current-board-title').textContent = titles[pageNum - 1];
+            document.getElementById('current-board-title').textContent = boards[pageIndex].name;
 
             // 触发图表动画重播
-            // 获取当前页面的看板ID（假设顺序为 board-1, board-2... 与 pageNum 对应）
-            // 注意：这里假设 boards 数组顺序与页面顺序一致
-            if (boards.length >= pageNum) {
-                const boardId = boards[pageNum - 1].id;
-                const chart = charts[boardId];
-                if (chart) {
-                    // 稍微延迟一下，确保页面 visible 后再重播动画
-                    setTimeout(() => {
-                        chart.reset();
-                        chart.update();
-                    }, 50);
-                }
+            const boardId = boards[pageIndex].id;
+            const chart = charts[boardId];
+            if (chart) {
+                setTimeout(() => {
+                    chart.reset();
+                    chart.update();
+                }, 50);
             }
+        }
+
+        // 渲染导航按钮
+        function renderNavButtons() {
+            const container = document.getElementById('nav-buttons-container');
+            container.innerHTML = '';
+            boards.forEach((board, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'nav-button' + (index === currentPageIndex ? ' active' : '');
+                btn.textContent = board.name;
+                btn.onclick = () => switchPage(index);
+                container.appendChild(btn);
+            });
+        }
+
+        // 渲染所有页面
+        function renderPages() {
+            // 移除已有的动态页面
+            document.querySelectorAll('.page.dynamic-page').forEach(p => p.remove());
+
+            boards.forEach((board, index) => {
+                let pageEl = document.getElementById(`page-${board.id}`);
+                if (!pageEl) {
+                    pageEl = createBoardPage(board);
+                    document.body.insertBefore(pageEl, document.getElementById('line-chart-modal'));
+                }
+                pageEl.classList.toggle('active', index === currentPageIndex);
+            });
+        }
+
+        // 创建看板页面 HTML
+        function createBoardPage(board) {
+            const page = document.createElement('div');
+            page.className = 'page dynamic-page';
+            page.id = `page-${board.id}`;
+            page.innerHTML = `
+                <div class="container">
+                    <div class="board-section" id="board-${board.id}">
+                        <div class="board-content">
+                            <!-- 左列：每日记录 -->
+                            <div class="input-panel">
+                                <div class="input-section full-height">
+                                    <div class="section-title">每日记录</div>
+                                    <form id="form-board-${board.id}">
+                                        <div class="form-group">
+                                            <label>日期</label>
+                                            <input type="date" id="date-board-${board.id}" required>
+                                        </div>
+                                        <div class="dimension-inputs" id="dimensions-board-${board.id}">
+                                            <!-- 动态生成维度输入框 -->
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">保存记录</button>
+                                    </form>
+                                </div>
+                            </div>
+                            <!-- 中列：雷达图 -->
+                            <div class="center-panel">
+                                <canvas id="chart-board-${board.id}"></canvas>
+                            </div>
+                            <!-- 右列：统计 + 历史记录 -->
+                            <div class="right-panel">
+                                <div class="stats-section">
+                                    <div class="section-title">本周统计</div>
+                                    <div class="stats-grid" id="stats-board-${board.id}">
+                                        <!-- 动态生成统计卡片 -->
+                                    </div>
+                                </div>
+                                <div class="records-section">
+                                    <div class="section-title">历史记录</div>
+                                    <div class="records-container" id="records-board-${board.id}">
+                                        <div class="loading">加载中...</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            return page;
         }
 
         // 初始化应用
@@ -728,21 +1111,30 @@
                 const response = await fetch(`${API_BASE}/boards`);
                 boards = await response.json();
                 
+                // 渲染导航和页面
+                renderNavButtons();
+                renderPages();
+                
                 // 为每个看板初始化
                 for (let i = 0; i < boards.length; i++) {
                     const board = boards[i];
-                    await initBoard(board, i + 1);
+                    await initBoardDynamic(board);
+                }
+                
+                // 默认显示第一个
+                if (boards.length > 0) {
+                    switchPage(0);
                 }
             } catch (error) {
                 console.error('初始化失败:', error);
                 showError('加载数据失败，请刷新页面重试');
             }
         }
-
-        // 初始化单个看板
-        async function initBoard(board, index) {
+        
+        // 动态初始化单个看板
+        async function initBoardDynamic(board) {
             const boardId = board.id;
-            const boardPrefix = `board-${index}`;
+            const boardPrefix = `board-${boardId}`;
 
             // 设置默认日期为今天
             const dateInput = document.getElementById(`date-${boardPrefix}`);
@@ -750,40 +1142,180 @@
                 dateInput.value = new Date().toISOString().split('T')[0];
             }
 
-            // 生成维度输入框（优化排版：标签和输入框在同一行）
+            // 生成维度输入框
             const dimensionsContainer = document.getElementById(`dimensions-${boardPrefix}`);
-            dimensionsContainer.innerHTML = '';
-            board.dimensions.forEach(dim => {
-                const div = document.createElement('div');
-                div.className = 'dimension-item';
-                div.innerHTML = `
-                    <label>${dim}</label>
-                    <input type="number" 
-                           min="0" 
-                           max="10" 
-                           step="1" 
-                           data-dimension="${dim}" 
-                           placeholder="0-10"
-                           required>
-                `;
-                dimensionsContainer.appendChild(div);
-            });
+            if (dimensionsContainer) {
+                dimensionsContainer.innerHTML = '';
+                board.dimensions.forEach(dim => {
+                    const div = document.createElement('div');
+                    div.className = 'dimension-item';
+                    div.innerHTML = `
+                        <label>${dim}</label>
+                        <input type="number" 
+                               min="0" 
+                               max="10" 
+                               step="1" 
+                               data-dimension="${dim}" 
+                               placeholder="0-10"
+                               required>
+                    `;
+                    dimensionsContainer.appendChild(div);
+                });
+            }
 
             // 绑定表单提交事件
             const form = document.getElementById(`form-${boardPrefix}`);
-            form.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                await saveRecord(boardId, boardPrefix);
-            });
+            if (form) {
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    await saveRecord(boardId, boardPrefix);
+                });
+            }
 
             // 初始化雷达图
-            initChart(board, boardPrefix);
+            initChartDynamic(board, boardPrefix);
 
             // 加载统计数据
             await loadWeeklyStats(boardId, boardPrefix);
 
             // 加载历史记录
             await loadRecords(boardId, boardPrefix);
+        }
+        
+        // 动态初始化雷达图
+        function initChartDynamic(board, boardPrefix) {
+            const ctx = document.getElementById(`chart-${boardPrefix}`);
+            if (!ctx) return;
+
+            charts[board.id] = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: board.dimensions,
+                    datasets: [
+                        {
+                            label: '本周平均值',
+                            data: board.dimensions.map(() => 0),
+                            borderColor: 'rgb(102, 126, 234)',
+                            backgroundColor: 'rgba(102, 126, 234, 0.2)',
+                            pointBackgroundColor: 'rgb(102, 126, 234)',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgb(102, 126, 234)',
+                            borderWidth: 3,
+                            pointRadius: 5,
+                            pointHoverRadius: 7
+                        },
+                        {
+                            label: '上周平均值',
+                            data: board.dimensions.map(() => 0),
+                            borderColor: 'rgb(239, 68, 68)',
+                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                            pointBackgroundColor: 'rgb(239, 68, 68)',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgb(239, 68, 68)',
+                            borderWidth: 2,
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            borderDash: [5, 5]
+                        }
+                    ]
+                },
+                plugins: [{
+                    id: 'dataLabels',
+                    afterDatasetsDraw(chart, args, options) {
+                        const { ctx, data } = chart;
+                        const blueVisible = chart.isDatasetVisible(0);
+                        const redVisible = chart.isDatasetVisible(1);
+                        let targetDatasetIndex = -1;
+                        let labelColor = '';
+                        
+                        if (blueVisible && redVisible) {
+                            targetDatasetIndex = 0;
+                            labelColor = '#667eea';
+                        } else if (blueVisible && !redVisible) {
+                            targetDatasetIndex = 0;
+                            labelColor = '#667eea';
+                        } else if (!blueVisible && redVisible) {
+                            targetDatasetIndex = 1;
+                            labelColor = '#ef4444';
+                        }
+                        
+                        if (targetDatasetIndex === -1) return;
+                        
+                        const dataset = data.datasets[targetDatasetIndex];
+                        const meta = chart.getDatasetMeta(targetDatasetIndex);
+                        
+                        ctx.save();
+                        ctx.font = 'bold 16px "Microsoft YaHei", sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillStyle = labelColor;
+                        
+                        meta.data.forEach((point, index) => {
+                            const value = dataset.data[index];
+                            if (value !== undefined && value !== null && value > 0) {
+                                const angle = Math.atan2(point.y - chart.scales.r.yCenter, point.x - chart.scales.r.xCenter);
+                                const radius = 20;
+                                const x = point.x + Math.cos(angle) * radius;
+                                const y = point.y + Math.sin(angle) * radius;
+                                ctx.fillText(value.toFixed(1), x, y);
+                            }
+                        });
+                        ctx.restore();
+                    }
+                }],
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    layout: {
+                        padding: { top: 10, bottom: 10, left: 10, right: 10 }
+                    },
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 10,
+                            ticks: {
+                                stepSize: 2,
+                                display: true,
+                                color: '#666',
+                                font: { size: 10 },
+                                backdropColor: 'rgba(255, 255, 255, 0.7)',
+                                showLabelBackdrop: true
+                            },
+                            grid: {
+                                color: 'rgba(102, 126, 234, 0.3)',
+                                lineWidth: 1.5,
+                                circular: true
+                            },
+                            angleLines: {
+                                color: 'rgba(102, 126, 234, 0.3)',
+                                lineWidth: 1.5
+                            },
+                            pointLabels: {
+                                font: {
+                                    size: 12,
+                                    weight: 'bold',
+                                    family: "'Microsoft YaHei', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial"
+                                },
+                                color: '#333',
+                                padding: 8
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 12,
+                                padding: 15,
+                                font: { size: 12, weight: 'bold' }
+                            }
+                        }
+                    }
+                }
+            });
         }
 
         // 保存记录
@@ -825,163 +1357,6 @@
                 console.error('保存记录失败:', error);
                 alert('保存失败，请重试');
             }
-        }
-
-        // 初始化雷达图
-        function initChart(board, boardPrefix) {
-            const ctx = document.getElementById(`chart-${boardPrefix}`);
-            if (!ctx) return;
-
-            charts[board.id] = new Chart(ctx, {
-                type: 'radar',
-                data: {
-                    labels: board.dimensions,
-                    datasets: [
-                        {
-                            label: '本周平均值',
-                            data: board.dimensions.map(() => 0),
-                            borderColor: 'rgb(102, 126, 234)',
-                            backgroundColor: 'rgba(102, 126, 234, 0.2)',
-                            pointBackgroundColor: 'rgb(102, 126, 234)',
-                            pointBorderColor: '#fff',
-                            pointHoverBackgroundColor: '#fff',
-                            pointHoverBorderColor: 'rgb(102, 126, 234)',
-                            borderWidth: 3,
-                            pointRadius: 5,
-                            pointHoverRadius: 7
-                        },
-                        {
-                            label: '上周平均值',
-                            data: board.dimensions.map(() => 0),
-                            borderColor: 'rgb(239, 68, 68)',
-                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                            pointBackgroundColor: 'rgb(239, 68, 68)',
-                            pointBorderColor: '#fff',
-                            pointHoverBackgroundColor: '#fff',
-                            pointHoverBorderColor: 'rgb(239, 68, 68)',
-                            borderWidth: 2,
-                            pointRadius: 4,
-                            pointHoverRadius: 6,
-                            borderDash: [5, 5] // 虚线样式区分上周
-                        }
-                    ]
-                },
-                // 注册自定义插件：智能显示数值标签
-                plugins: [{
-                    id: 'dataLabels',
-                    afterDatasetsDraw(chart, args, options) {
-                        const { ctx, data } = chart;
-                        
-                        // 获取两个数据集的可见性
-                        const blueVisible = chart.isDatasetVisible(0);
-                        const redVisible = chart.isDatasetVisible(1);
-                        
-                        // 判断显示哪个数据集的数字
-                        let targetDatasetIndex = -1;
-                        let labelColor = '';
-                        
-                        if (blueVisible && redVisible) {
-                            // 两个都显示时，只显示蓝色（本周）的数字
-                            targetDatasetIndex = 0;
-                            labelColor = '#667eea';
-                        } else if (blueVisible && !redVisible) {
-                            // 只有蓝色显示
-                            targetDatasetIndex = 0;
-                            labelColor = '#667eea';
-                        } else if (!blueVisible && redVisible) {
-                            // 只有红色显示
-                            targetDatasetIndex = 1;
-                            labelColor = '#ef4444';
-                        }
-                        // 如果两个都隐藏，不显示任何数字
-                        
-                        if (targetDatasetIndex === -1) return;
-                        
-                        const dataset = data.datasets[targetDatasetIndex];
-                        const meta = chart.getDatasetMeta(targetDatasetIndex);
-                        
-                        ctx.save();
-                        ctx.font = 'bold 16px "Microsoft YaHei", sans-serif';
-                        ctx.textAlign = 'center';
-                        ctx.textBaseline = 'middle';
-                        ctx.fillStyle = labelColor;
-                        
-                        meta.data.forEach((point, index) => {
-                            const value = dataset.data[index];
-                            if (value !== undefined && value !== null && value > 0) {
-                                // 计算标注位置：稍微偏离点中心
-                                const angle = Math.atan2(point.y - chart.scales.r.yCenter, point.x - chart.scales.r.xCenter);
-                                const radius = 20;
-                                const x = point.x + Math.cos(angle) * radius;
-                                const y = point.y + Math.sin(angle) * radius;
-                                
-                                ctx.fillText(value.toFixed(1), x, y);
-                            }
-                        });
-                        ctx.restore();
-                    }
-                }],
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    layout: {
-                        padding: {
-                            top: 10,
-                            bottom: 10,
-                            left: 10,
-                            right: 10
-                        }
-                    },
-                    scales: {
-                        r: {
-                            beginAtZero: true,
-                            max: 10,
-                            ticks: {
-                                stepSize: 2,
-                                display: true,
-                                color: '#666',
-                                font: {
-                                    size: 10
-                                },
-                                backdropColor: 'rgba(255, 255, 255, 0.7)',
-                                showLabelBackdrop: true
-                            },
-                            grid: {
-                                color: 'rgba(102, 126, 234, 0.3)',
-                                lineWidth: 1.5,
-                                circular: true
-                            },
-                            angleLines: {
-                                color: 'rgba(102, 126, 234, 0.3)',
-                                lineWidth: 1.5
-                            },
-                            pointLabels: {
-                                font: {
-                                    size: 12,
-                                    weight: 'bold',
-                                    family: "'Microsoft YaHei', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial"
-                                },
-                                color: '#333',
-                                padding: 8
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            display: true,
-                            position: 'bottom',
-                            labels: {
-                                boxWidth: 12,
-                                padding: 15,
-                                font: {
-                                    size: 12,
-                                    weight: 'bold'
-                                }
-                            }
-                        }
-                    }
-                }
-            });
         }
 
         // 更新雷达图（同时更新本周和上周数据）
@@ -1319,6 +1694,337 @@
             }
         });
 
+        // ==================== 看板管理功能 ====================
+        
+        // 打开管理面板
+        function openManagePanel() {
+            document.getElementById('manage-modal').classList.add('active');
+            loadActiveBoardsList();
+            switchManageTab('boards');
+        }
+
+        // 关闭管理面板
+        function closeManagePanel() {
+            document.getElementById('manage-modal').classList.remove('active');
+            // 清空创建表单
+            document.getElementById('new-board-name').value = '';
+            newDimensions = [];
+            renderNewDimensionsTags();
+            updateCreateButtonState();
+        }
+
+        // 切换管理面板标签页
+        function switchManageTab(tab) {
+            document.querySelectorAll('.manage-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.manage-section').forEach(s => s.classList.remove('active'));
+            
+            if (tab === 'boards') {
+                document.querySelector('.manage-tab:first-child').classList.add('active');
+                document.getElementById('manage-boards').classList.add('active');
+                loadActiveBoardsList();
+            } else {
+                document.querySelector('.manage-tab:last-child').classList.add('active');
+                document.getElementById('manage-deleted').classList.add('active');
+                loadDeletedBoardsList();
+            }
+        }
+
+        // 加载活跃看板列表
+        async function loadActiveBoardsList() {
+            const list = document.getElementById('active-boards-list');
+            list.innerHTML = '<div class="loading">加载中...</div>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/boards`);
+                const activeBoards = await response.json();
+                
+                if (activeBoards.length === 0) {
+                    list.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📋</div>
+                            <div class="empty-state-text">暂无看板，请创建一个</div>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                list.innerHTML = '';
+                activeBoards.forEach(board => {
+                    const item = document.createElement('div');
+                    item.className = 'board-item';
+                    item.innerHTML = `
+                        <div class="board-item-info">
+                            <div class="board-item-name">${board.name}</div>
+                            <div class="board-item-dims">${board.dimensions.length} 个维度：${board.dimensions.slice(0, 3).join('、')}${board.dimensions.length > 3 ? '...' : ''}</div>
+                        </div>
+                        <div class="board-item-actions">
+                            <button class="board-item-btn delete" onclick="deleteBoard(${board.id}, '${board.name}')">删除</button>
+                        </div>
+                    `;
+                    list.appendChild(item);
+                });
+            } catch (error) {
+                console.error('加载看板列表失败:', error);
+                list.innerHTML = '<div class="error">加载失败</div>';
+            }
+        }
+
+        // 加载已删除看板列表
+        async function loadDeletedBoardsList() {
+            const list = document.getElementById('deleted-boards-list');
+            list.innerHTML = '<div class="loading">加载中...</div>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/boards/deleted/list`);
+                const deletedBoards = await response.json();
+                
+                if (deletedBoards.length === 0) {
+                    list.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">🗑️</div>
+                            <div class="empty-state-text">最近删除为空</div>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                list.innerHTML = '';
+                deletedBoards.forEach(board => {
+                    const deletedAt = board.deleted_at ? new Date(board.deleted_at).toLocaleString('zh-CN') : '未知时间';
+                    const item = document.createElement('div');
+                    item.className = 'board-item';
+                    item.innerHTML = `
+                        <div class="board-item-info">
+                            <div class="board-item-name">${board.name}</div>
+                            <div class="board-item-dims">${board.dimensions.length} 个维度</div>
+                            <div class="board-item-deleted-at">删除于 ${deletedAt}</div>
+                        </div>
+                        <div class="board-item-actions">
+                            <button class="board-item-btn restore" onclick="restoreBoard(${board.id})">恢复</button>
+                            <button class="board-item-btn permanent" onclick="permanentDeleteBoard(${board.id}, '${board.name}')">永久删除</button>
+                        </div>
+                    `;
+                    list.appendChild(item);
+                });
+            } catch (error) {
+                console.error('加载已删除看板列表失败:', error);
+                list.innerHTML = '<div class="error">加载失败</div>';
+            }
+        }
+
+        // 删除看板（软删除）
+        async function deleteBoard(boardId, boardName) {
+            if (!confirm(`确定要删除看板「${boardName}」吗？\n删除后可在"最近删除"中恢复。`)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/boards/${boardId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    // 重新加载应用
+                    await reloadApp();
+                    loadActiveBoardsList();
+                } else {
+                    throw new Error('删除失败');
+                }
+            } catch (error) {
+                console.error('删除看板失败:', error);
+                alert('删除失败，请重试');
+            }
+        }
+
+        // 恢复看板
+        async function restoreBoard(boardId) {
+            try {
+                const response = await fetch(`${API_BASE}/boards/${boardId}/restore`, {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    await reloadApp();
+                    loadDeletedBoardsList();
+                } else {
+                    throw new Error('恢复失败');
+                }
+            } catch (error) {
+                console.error('恢复看板失败:', error);
+                alert('恢复失败，请重试');
+            }
+        }
+
+        // 永久删除看板
+        async function permanentDeleteBoard(boardId, boardName) {
+            if (!confirm(`⚠️ 确定要永久删除看板「${boardName}」吗？\n此操作不可恢复，所有相关数据将被清除！`)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/boards/${boardId}/permanent`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    loadDeletedBoardsList();
+                } else {
+                    throw new Error('永久删除失败');
+                }
+            } catch (error) {
+                console.error('永久删除看板失败:', error);
+                alert('永久删除失败，请重试');
+            }
+        }
+
+        // 添加新维度
+        function addNewDimension() {
+            const input = document.getElementById('new-dimension-input');
+            const value = input.value.trim();
+            
+            if (!value) return;
+            if (newDimensions.includes(value)) {
+                alert('该维度已存在');
+                return;
+            }
+            
+            newDimensions.push(value);
+            input.value = '';
+            renderNewDimensionsTags();
+            updateCreateButtonState();
+        }
+
+        // 处理维度输入框回车
+        function handleDimensionKeypress(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                addNewDimension();
+            }
+        }
+
+        // 移除维度
+        function removeNewDimension(index) {
+            newDimensions.splice(index, 1);
+            renderNewDimensionsTags();
+            updateCreateButtonState();
+        }
+
+        // 渲染新维度标签
+        function renderNewDimensionsTags() {
+            const container = document.getElementById('new-dimensions-tags');
+            container.innerHTML = '';
+            newDimensions.forEach((dim, index) => {
+                const tag = document.createElement('div');
+                tag.className = 'dimension-tag';
+                tag.innerHTML = `
+                    <span>${dim}</span>
+                    <button class="dimension-tag-remove" onclick="removeNewDimension(${index})">×</button>
+                `;
+                container.appendChild(tag);
+            });
+        }
+
+        // 更新创建按钮状态
+        function updateCreateButtonState() {
+            const nameInput = document.getElementById('new-board-name');
+            const btn = document.getElementById('create-board-btn');
+            btn.disabled = !nameInput.value.trim() || newDimensions.length < 2;
+        }
+
+        // 监听看板名称输入
+        document.addEventListener('DOMContentLoaded', () => {
+            const nameInput = document.getElementById('new-board-name');
+            if (nameInput) {
+                nameInput.addEventListener('input', updateCreateButtonState);
+            }
+        });
+
+        // 创建新看板
+        async function createNewBoard() {
+            const name = document.getElementById('new-board-name').value.trim();
+            
+            if (!name) {
+                alert('请输入看板名称');
+                return;
+            }
+            if (newDimensions.length < 2) {
+                alert('至少需要2个维度');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/boards`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: name,
+                        dimensions: newDimensions
+                    })
+                });
+                
+                if (response.ok) {
+                    // 清空表单
+                    document.getElementById('new-board-name').value = '';
+                    newDimensions = [];
+                    renderNewDimensionsTags();
+                    updateCreateButtonState();
+                    
+                    // 重新加载应用
+                    await reloadApp();
+                    loadActiveBoardsList();
+                    
+                    alert('看板创建成功！');
+                } else {
+                    const error = await response.json();
+                    throw new Error(error.detail || '创建失败');
+                }
+            } catch (error) {
+                console.error('创建看板失败:', error);
+                alert('创建失败：' + error.message);
+            }
+        }
+
+        // 重新加载应用（不关闭管理面板）
+        async function reloadApp() {
+            try {
+                // 销毁现有图表
+                Object.values(charts).forEach(chart => {
+                    if (chart) chart.destroy();
+                });
+                charts = {};
+                
+                // 重新加载看板列表
+                const response = await fetch(`${API_BASE}/boards`);
+                boards = await response.json();
+                
+                // 重新渲染
+                renderNavButtons();
+                renderPages();
+                
+                // 重新初始化每个看板
+                for (let i = 0; i < boards.length; i++) {
+                    await initBoardDynamic(boards[i]);
+                }
+                
+                // 切换到第一个页面或保持当前页面
+                if (boards.length > 0) {
+                    const newIndex = Math.min(currentPageIndex, boards.length - 1);
+                    switchPage(newIndex);
+                }
+            } catch (error) {
+                console.error('重新加载失败:', error);
+            }
+        }
+
+        // 点击管理模态框背景关闭
+        document.addEventListener('click', function(e) {
+            if (e.target.id === 'manage-modal') {
+                closeManagePanel();
+            }
+        });
+
         // 页面加载完成后初始化
         document.addEventListener('DOMContentLoaded', init);
 </script>
@@ -1332,6 +2038,58 @@
         </div>
         <div class="modal-chart">
             <canvas id="line-chart-canvas"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- 看板管理模态框 -->
+<div class="manage-modal" id="manage-modal">
+    <div class="manage-panel">
+        <div class="manage-header">
+            <div class="manage-title">管理看板</div>
+            <button class="manage-close" onclick="closeManagePanel()">&times;</button>
+        </div>
+        <div class="manage-tabs">
+            <button class="manage-tab active" onclick="switchManageTab('boards')">所有看板</button>
+            <button class="manage-tab" onclick="switchManageTab('deleted')">最近删除</button>
+        </div>
+        <div class="manage-body">
+            <!-- 所有看板页面 -->
+            <div class="manage-section active" id="manage-boards">
+                <!-- 创建新看板表单 -->
+                <div class="create-form">
+                    <div class="create-form-title">
+                        <span>➕</span> 创建新看板
+                    </div>
+                    <div class="create-form-group">
+                        <label class="create-form-label">看板名称</label>
+                        <input type="text" class="create-form-input" id="new-board-name" placeholder="例如：每日习惯">
+                    </div>
+                    <div class="create-form-group">
+                        <label class="create-form-label">维度列表</label>
+                        <div class="dimension-tags" id="new-dimensions-tags">
+                            <!-- 动态生成维度标签 -->
+                        </div>
+                        <div class="add-dimension-row">
+                            <input type="text" id="new-dimension-input" placeholder="输入维度名称" onkeypress="handleDimensionKeypress(event)">
+                            <button class="add-dimension-btn" onclick="addNewDimension()">添加</button>
+                        </div>
+                    </div>
+                    <button class="create-submit-btn" id="create-board-btn" onclick="createNewBoard()" disabled>创建看板</button>
+                </div>
+
+                <!-- 看板列表 -->
+                <div class="board-list" id="active-boards-list">
+                    <!-- 动态生成 -->
+                </div>
+            </div>
+
+            <!-- 最近删除页面 -->
+            <div class="manage-section" id="manage-deleted">
+                <div class="board-list" id="deleted-boards-list">
+                    <!-- 动态生成 -->
+                </div>
+            </div>
         </div>
     </div>
 </div>
