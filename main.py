@@ -1,8 +1,7 @@
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy import create_engine, Column, Integer, String, Date, JSON
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, Session
-from pydantic import BaseModel
+from sqlalchemy.orm import declarative_base, sessionmaker, Session
+from pydantic import BaseModel, ConfigDict
 from datetime import date, timedelta
 from typing import Dict, List, Optional
 
@@ -59,12 +58,11 @@ class BoardCreate(BaseModel):
 
 
 class BoardResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     name: str
     dimensions: List[str]
-
-    class Config:
-        from_attributes = True
 
 
 class DailyRecordCreate(BaseModel):
@@ -74,13 +72,12 @@ class DailyRecordCreate(BaseModel):
 
 
 class DailyRecordResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     board_id: int
     record_date: date
     values: Dict[str, float]
-
-    class Config:
-        from_attributes = True
 
 
 class WeeklyStatsResponse(BaseModel):
@@ -390,3 +387,10 @@ def get_dimension_history(
 
 # ==================== 静态文件服务 ====================
 app.mount("/", StaticFiles(directory="static", html=True), name="static")
+
+
+# ==================== 启动服务器 ====================
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(app, host="127.0.0.1", port=8000)
