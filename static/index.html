@@ -1009,10 +1009,16 @@
                 overflow: visible;
             }
 
-            /* 雷达图区域 */
+            /* 雷达图区域 - 增大显示 */
             .center-panel {
-                min-height: 300px;
+                min-height: 480px;
                 order: -1; /* 雷达图放最上面 */
+                padding: 25px 15px 55px 15px; /* 四周留空间给标签和图例 */
+            }
+
+            .center-panel canvas {
+                max-width: 100%;
+                max-height: 400px;
             }
 
             /* 输入区域 */
@@ -1289,10 +1295,27 @@
             await loadRecords(boardId, boardPrefix);
         }
         
+        // 检测是否为移动端
+        function isMobile() {
+            return window.innerWidth <= 768;
+        }
+
         // 动态初始化雷达图
         function initChartDynamic(board, boardPrefix) {
             const ctx = document.getElementById(`chart-${boardPrefix}`);
             if (!ctx) return;
+
+            const mobile = isMobile();
+            
+            // 根据屏幕大小调整配置
+            const fontSize = mobile ? 11 : 12;
+            const dataLabelFontSize = mobile ? 14 : 16;
+            const dataLabelRadius = mobile ? 25 : 20;
+            const pointRadius = mobile ? 4 : 5;
+            const legendFontSize = mobile ? 11 : 12;
+            const legendBoxWidth = mobile ? 10 : 12;
+            const legendPadding = mobile ? 8 : 15;
+            const layoutPadding = mobile ? { top: 15, bottom: 15, left: 15, right: 15 } : { top: 10, bottom: 10, left: 10, right: 10 };
 
             charts[board.id] = new Chart(ctx, {
                 type: 'radar',
@@ -1309,8 +1332,8 @@
                             pointHoverBackgroundColor: '#fff',
                             pointHoverBorderColor: 'rgb(102, 126, 234)',
                             borderWidth: 3,
-                            pointRadius: 5,
-                            pointHoverRadius: 7
+                            pointRadius: pointRadius,
+                            pointHoverRadius: pointRadius + 2
                         },
                         {
                             label: '上周平均值',
@@ -1322,8 +1345,8 @@
                             pointHoverBackgroundColor: '#fff',
                             pointHoverBorderColor: 'rgb(239, 68, 68)',
                             borderWidth: 2,
-                            pointRadius: 4,
-                            pointHoverRadius: 6,
+                            pointRadius: pointRadius - 1,
+                            pointHoverRadius: pointRadius + 1,
                             borderDash: [5, 5]
                         }
                     ]
@@ -1353,8 +1376,10 @@
                         const dataset = data.datasets[targetDatasetIndex];
                         const meta = chart.getDatasetMeta(targetDatasetIndex);
                         
+                        // 移动端使用更大字体
+                        const currentFontSize = window.innerWidth <= 768 ? 14 : 16;
                         ctx.save();
-                        ctx.font = 'bold 16px "Microsoft YaHei", sans-serif';
+                        ctx.font = `bold ${currentFontSize}px "Microsoft YaHei", sans-serif`;
                         ctx.textAlign = 'center';
                         ctx.textBaseline = 'middle';
                         ctx.fillStyle = labelColor;
@@ -1363,9 +1388,9 @@
                             const value = dataset.data[index];
                             if (value !== undefined && value !== null && value > 0) {
                                 const angle = Math.atan2(point.y - chart.scales.r.yCenter, point.x - chart.scales.r.xCenter);
-                                const radius = 20;
-                                const x = point.x + Math.cos(angle) * radius;
-                                const y = point.y + Math.sin(angle) * radius;
+                                const currentRadius = window.innerWidth <= 768 ? 25 : 20;
+                                const x = point.x + Math.cos(angle) * currentRadius;
+                                const y = point.y + Math.sin(angle) * currentRadius;
                                 ctx.fillText(value.toFixed(1), x, y);
                             }
                         });
@@ -1376,7 +1401,7 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     layout: {
-                        padding: { top: 10, bottom: 10, left: 10, right: 10 }
+                        padding: layoutPadding
                     },
                     scales: {
                         r: {
@@ -1386,7 +1411,7 @@
                                 stepSize: 2,
                                 display: true,
                                 color: '#666',
-                                font: { size: 10 },
+                                font: { size: mobile ? 9 : 10 },
                                 backdropColor: 'rgba(255, 255, 255, 0.7)',
                                 showLabelBackdrop: true
                             },
@@ -1401,12 +1426,21 @@
                             },
                             pointLabels: {
                                 font: {
-                                    size: 12,
+                                    size: mobile ? 10 : fontSize,
                                     weight: 'bold',
                                     family: "'Microsoft YaHei', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial"
                                 },
                                 color: '#333',
-                                padding: 8
+                                padding: mobile ? 15 : 8,
+                                callback: function(label) {
+                                    // 移动端：长标签智能换行
+                                    if (window.innerWidth <= 768 && label.length > 6) {
+                                        // 尝试在中间位置换行，最多2行
+                                        const mid = Math.ceil(label.length / 2);
+                                        return [label.substring(0, mid), label.substring(mid)];
+                                    }
+                                    return label;
+                                }
                             }
                         }
                     },
@@ -1415,9 +1449,9 @@
                             display: true,
                             position: 'bottom',
                             labels: {
-                                boxWidth: 12,
-                                padding: 15,
-                                font: { size: 12, weight: 'bold' }
+                                boxWidth: legendBoxWidth,
+                                padding: legendPadding,
+                                font: { size: legendFontSize, weight: 'bold' }
                             }
                         }
                     }
