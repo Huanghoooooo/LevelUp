@@ -2,8 +2,18 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>多维度追踪看板</title>
+    
+    <!-- PWA 支持 -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#22c55e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="LevelUp">
+    <link rel="apple-touch-icon" href="/icon.svg">
+    <link rel="icon" type="image/svg+xml" href="/icon.svg">
+    
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
         * {
@@ -2234,5 +2244,20 @@
         </div>
     </div>
 </div>
+
+<!-- 注册 Service Worker -->
+<script>
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+                console.log('✅ Service Worker 注册成功:', registration.scope);
+            })
+            .catch((error) => {
+                console.log('❌ Service Worker 注册失败:', error);
+            });
+    });
+}
+</script>
 </body>
 </html>

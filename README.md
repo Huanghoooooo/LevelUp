@@ -69,23 +69,72 @@ LevelUp/
 
 ## 快速开始
 
-### 1. 安装依赖
+### 本地开发
 
-使用 uv 安装依赖：
+1. 安装依赖：
 
 ```bash
 uv sync
 ```
 
-### 2. 运行应用
+2. 运行应用：
 
 ```bash
-uv run uvicorn main:app --reload
+python main.py
 ```
 
-### 3. 访问应用
+3. 访问应用：`http://localhost:8000`
 
-打开浏览器访问：`http://localhost:8000`
+4. 手机访问（同一 WiFi）：`http://电脑IP:8000`
+
+---
+
+## 🚀 部署到 Railway（免费云平台）
+
+### 一键部署步骤：
+
+1. **推送代码到 GitHub**
+
+```bash
+git init
+git add .
+git commit -m "Initial commit"
+git remote add origin https://github.com/你的用户名/LevelUp.git
+git push -u origin main
+```
+
+2. **连接 Railway**
+
+    - 访问 [railway.app](https://railway.app)
+    - 用 GitHub 账号登录
+    - 点击 "New Project" → "Deploy from GitHub repo"
+    - 选择你的 LevelUp 仓库
+    - Railway 会自动检测 Python 项目并部署
+
+3. **获取访问地址**
+
+    - 部署完成后，点击 "Settings" → "Generate Domain"
+    - 获得类似 `levelup-xxx.up.railway.app` 的地址
+
+4. **手机安装 PWA**
+    - 手机浏览器访问你的 Railway 地址
+    - 点击浏览器菜单 → "添加到主屏幕"
+    - 像原生 App 一样使用！
+
+### 数据同步
+
+部署后，手机和电脑访问同一个地址，数据自动同步！
+
+---
+
+## 📱 PWA 支持
+
+本应用支持 PWA（渐进式 Web 应用）：
+
+-   ✅ 可添加到手机主屏幕
+-   ✅ 全屏运行，无浏览器地址栏
+-   ✅ 自定义图标和启动画面
+-   ✅ 基本离线缓存支持
 
 ## 使用说明
 

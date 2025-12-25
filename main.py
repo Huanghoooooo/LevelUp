@@ -478,51 +478,60 @@ app.mount("/", StaticFiles(directory="static", html=True), name="static")
 
 # ==================== 启动服务器 ====================
 if __name__ == "__main__":
+    import os
+    import platform
     import subprocess
     import sys
 
     import uvicorn
 
-    def is_port_in_use(port: int) -> int | None:
-        """检查端口是否被占用，返回占用进程的 PID，未占用返回 None"""
-        try:
-            result = subprocess.run(
-                ["netstat", "-ano"],
-                capture_output=True,
-                text=True,
-                creationflags=subprocess.CREATE_NO_WINDOW,
-            )
-            for line in result.stdout.splitlines():
-                if f"127.0.0.1:{port}" in line and "LISTENING" in line:
-                    parts = line.split()
-                    return int(parts[-1])
-        except Exception:
-            pass
-        return None
+    # 从环境变量获取端口（Railway 会自动设置 PORT）
+    port = int(os.environ.get("PORT", 8000))
+    host = os.environ.get("HOST", "0.0.0.0")
 
-    def kill_process(pid: int) -> bool:
-        """杀死指定 PID 的进程"""
-        try:
-            subprocess.run(
-                ["taskkill", "/PID", str(pid), "/F"],
-                capture_output=True,
-                creationflags=subprocess.CREATE_NO_WINDOW,
-            )
-            return True
-        except Exception:
-            return False
+    # 仅在 Windows 本地开发时检测端口占用
+    if platform.system() == "Windows" and "RAILWAY_ENVIRONMENT" not in os.environ:
 
-    port = 8000
-    pid = is_port_in_use(port)
-    if pid:
-        print(f"⚠️  端口 {port} 被进程 {pid} 占用，正在尝试释放...")
-        if kill_process(pid):
-            print(f"✅ 已终止进程 {pid}")
-            import time
+        def is_port_in_use(check_port: int) -> int | None:
+            """检查端口是否被占用，返回占用进程的 PID，未占用返回 None"""
+            try:
+                result = subprocess.run(
+                    ["netstat", "-ano"],
+                    capture_output=True,
+                    text=True,
+                    creationflags=subprocess.CREATE_NO_WINDOW,
+                )
+                for line in result.stdout.splitlines():
+                    if f"127.0.0.1:{check_port}" in line and "LISTENING" in line:
+                        parts = line.split()
+                        return int(parts[-1])
+            except Exception:
+                pass
+            return None
 
-            time.sleep(0.5)  # 等待端口释放
-        else:
-            print(f"❌ 无法终止进程 {pid}，请手动处理")
-            sys.exit(1)
+        def kill_process(pid: int) -> bool:
+            """杀死指定 PID 的进程"""
+            try:
+                subprocess.run(
+                    ["taskkill", "/PID", str(pid), "/F"],
+                    capture_output=True,
+                    creationflags=subprocess.CREATE_NO_WINDOW,
+                )
+                return True
+            except Exception:
+                return False
 
-    uvicorn.run(app, host="0.0.0.0", port=port)
+        pid = is_port_in_use(port)
+        if pid:
+            print(f"⚠️  端口 {port} 被进程 {pid} 占用，正在尝试释放...")
+            if kill_process(pid):
+                print(f"✅ 已终止进程 {pid}")
+                import time
+
+                time.sleep(0.5)
+            else:
+                print(f"❌ 无法终止进程 {pid}，请手动处理")
+                sys.exit(1)
+
+    print(f"🚀 启动服务器: http://{host}:{port}")
+    uvicorn.run(app, host=host, port=port)
