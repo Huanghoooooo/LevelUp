@@ -951,6 +951,113 @@
         .empty-state-text {
             font-size: 14px;
         }
+
+        /* ==================== 移动端适配 ==================== */
+        @media (max-width: 768px) {
+            /* 导航栏调整 */
+            .nav-container {
+                flex-wrap: wrap;
+                gap: 8px;
+                padding: 8px 12px;
+            }
+
+            .nav-left {
+                position: static;
+                width: 100%;
+                justify-content: center;
+                margin-bottom: 4px;
+            }
+
+            .nav-title {
+                display: none; /* 手机端隐藏大标题 */
+            }
+
+            .nav-buttons {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 6px;
+            }
+
+            .nav-button {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+
+            .nav-manage-btn {
+                position: static;
+            }
+
+            body {
+                padding-top: 100px; /* 增加顶部空间 */
+            }
+
+            /* 三列布局改为单列 */
+            .board-content {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .page {
+                padding: 8px;
+                height: auto;
+                min-height: calc(100vh - 100px);
+                overflow-y: auto;
+            }
+
+            .board-section {
+                height: auto;
+                overflow: visible;
+            }
+
+            /* 雷达图区域 */
+            .center-panel {
+                min-height: 300px;
+                order: -1; /* 雷达图放最上面 */
+            }
+
+            /* 输入区域 */
+            .input-panel {
+                order: 0;
+            }
+
+            /* 右侧统计和记录 */
+            .right-panel {
+                order: 1;
+            }
+
+            /* 统计卡片 */
+            .stats-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .stat-card {
+                padding: 8px 4px;
+            }
+
+            .stat-label {
+                font-size: 11px;
+            }
+
+            .stat-value {
+                font-size: 16px;
+            }
+
+            /* 历史记录 */
+            .records-list {
+                max-height: 200px;
+            }
+        }
+
+        /* 更小的屏幕 */
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .board-title-nav {
+                font-size: 14px;
+            }
+        }
     </style>
 </head>
 <body>

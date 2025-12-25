@@ -525,4 +525,4 @@ if __name__ == "__main__":
             print(f"❌ 无法终止进程 {pid}，请手动处理")
             sys.exit(1)
 
-    uvicorn.run(app, host="127.0.0.1", port=port)
+    uvicorn.run(app, host="0.0.0.0", port=port)
