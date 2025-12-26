@@ -1,9 +1,11 @@
 // Service Worker for LevelUp PWA
-const CACHE_NAME = 'levelup-v1';
+// 更新版本号会强制更新缓存
+const CACHE_NAME = 'levelup-v2';
+
+// 只缓存真正的静态资源（不包含动态数据的）
 const STATIC_ASSETS = [
-  '/',
-  '/index.html',
-  '/manifest.json'
+  '/manifest.json',
+  '/icon.svg'
 ];
 
 // 安装 Service Worker
@@ -13,10 +15,11 @@ self.addEventListener('install', (event) => {
       return cache.addAll(STATIC_ASSETS);
     })
   );
+  // 立即激活新的 Service Worker
   self.skipWaiting();
 });
 
-// 激活 Service Worker
+// 激活 Service Worker - 清除旧缓存
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
@@ -30,41 +33,45 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// 网络优先策略（API 请求）
-// 缓存优先策略（静态资源）
+// 请求拦截策略
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
   
-  // API 请求：网络优先
+  // 所有 API 请求和 HTML 页面：始终从网络获取，不缓存
+  // 这确保了认证状态和数据始终是最新的
   if (url.pathname.startsWith('/boards') || 
       url.pathname.startsWith('/records') ||
+      url.pathname.startsWith('/auth') ||
+      url.pathname === '/' ||
+      url.pathname === '/index.html' ||
       event.request.method !== 'GET') {
     event.respondWith(
       fetch(event.request).catch(() => {
-        return new Response(JSON.stringify({ error: '离线状态，无法访问' }), {
-          headers: { 'Content-Type': 'application/json' }
-        });
+        // 离线时 API 请求返回错误
+        if (url.pathname.startsWith('/auth') || 
+            url.pathname.startsWith('/boards') || 
+            url.pathname.startsWith('/records')) {
+          return new Response(JSON.stringify({ error: '离线状态，无法访问' }), {
+            status: 503,
+            headers: { 'Content-Type': 'application/json' }
+          });
+        }
+        // 离线时尝试返回缓存的页面
+        return caches.match('/');
       })
     );
     return;
   }
   
-  // 静态资源：缓存优先，网络备用
+  // 只有静态资源使用缓存策略
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) {
-        // 后台更新缓存
-        fetch(event.request).then((response) => {
-          if (response.ok) {
-            caches.open(CACHE_NAME).then((cache) => {
-              cache.put(event.request, response);
-            });
-          }
-        });
         return cachedResponse;
       }
       return fetch(event.request).then((response) => {
-        if (response.ok) {
+        // 只缓存成功的静态资源请求
+        if (response.ok && STATIC_ASSETS.some(asset => url.pathname.endsWith(asset))) {
           const responseClone = response.clone();
           caches.open(CACHE_NAME).then((cache) => {
             cache.put(event.request, responseClone);
