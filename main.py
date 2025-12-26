@@ -115,24 +115,24 @@ def create_token(user_id: int) -> str:
         "exp": now + timedelta(hours=JWT_EXPIRATION_HOURS),
         "iat": now,
     }
-    print(f"🔑 create_token: 使用 JWT_SECRET = {JWT_SECRET[:20]}...")
-    token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
-    print(f"🔑 create_token: 生成 token = {token[:30]}...")
-    return token
+    return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
 
 def decode_token(token: str) -> Optional[dict]:
     """解码JWT令牌"""
     try:
-        print(f"🔑 decode_token: 使用 JWT_SECRET = {JWT_SECRET[:20]}...")
-        result = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
-        print(f"🔑 decode_token: 解码成功 = {result}")
+        # 添加 leeway 容忍时钟偏差（60秒）
+        result = jwt.decode(
+            token,
+            JWT_SECRET,
+            algorithms=[JWT_ALGORITHM],
+            options={"verify_iat": False},  # 不验证签发时间，避免时钟不同步问题
+        )
         return result
-    except jwt.ExpiredSignatureError as e:
-        print(f"🔑 decode_token: Token 已过期 - {e}")
+    except jwt.ExpiredSignatureError:
         return None
     except jwt.InvalidTokenError as e:
-        print(f"🔑 decode_token: Token 无效 - {e}")
+        print(f"🔑 decode_token 失败: {e}")
         return None
 
 
@@ -230,20 +230,14 @@ async def get_current_user(
 ) -> Optional[User]:
     """获取当前登录用户（可选认证）"""
     if credentials is None:
-        print("🔐 get_current_user: 没有收到 credentials")
         return None
 
     token = credentials.credentials
-    print(f"🔐 get_current_user: 收到 token: {token[:20]}...")
-
     payload = decode_token(token)
     if payload is None:
-        print("🔐 get_current_user: token 解码失败")
         return None
 
-    print(f"🔐 get_current_user: payload = {payload}")
     user = db.query(User).filter(User.id == payload["user_id"]).first()
-    print(f"🔐 get_current_user: 找到用户 = {user}")
     return user
 
 
@@ -484,27 +478,20 @@ def get_boards(
     user: Optional[User] = Depends(get_current_user), db: Session = Depends(get_db)
 ):
     """获取当前用户的所有未删除看板"""
-    # 调试日志
-    print(f"🔍 GET /boards - user: {user}, user_id: {user.id if user else None}")
-
     if user:
-        boards = (
+        return (
             db.query(Board)
             .filter(Board.user_id == user.id, Board.is_deleted.is_(False))
             .all()
         )
-        print(f"📋 返回用户 {user.id} 的看板: {[b.id for b in boards]}")
-        return boards
     else:
         # 未登录用户，返回无归属的看板（兼容旧数据）
         init_boards(db)
-        boards = (
+        return (
             db.query(Board)
             .filter(Board.user_id.is_(None), Board.is_deleted.is_(False))
             .all()
         )
-        print(f"📋 返回公共看板: {[b.id for b in boards]}")
-        return boards
 
 
 @app.get("/boards/deleted/list", response_model=List[BoardResponse])
