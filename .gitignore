@@ -27,4 +27,6 @@ Thumbs.db
 
 # uv
 .uv/
-uv.lock
+
+# 使用 uv 管理依赖，不需要 requirements.txt
+requirements.txt

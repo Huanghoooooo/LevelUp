@@ -1,9 +1,9 @@
 services:
-    - type: web
-      name: levelup
-      runtime: python
-      buildCommand: pip install -r requirements.txt
-      startCommand: python main.py
-      envVars:
-          - key: PYTHON_VERSION
-            value: "3.12"
+  - type: web
+    name: levelup
+    runtime: python
+    buildCommand: pip install uv && uv sync
+    startCommand: uv run python main.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12"
