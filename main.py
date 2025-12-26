@@ -222,14 +222,20 @@ async def get_current_user(
 ) -> Optional[User]:
     """获取当前登录用户（可选认证）"""
     if credentials is None:
+        print("🔐 get_current_user: 没有收到 credentials")
         return None
 
     token = credentials.credentials
+    print(f"🔐 get_current_user: 收到 token: {token[:20]}...")
+    
     payload = decode_token(token)
     if payload is None:
+        print("🔐 get_current_user: token 解码失败")
         return None
 
+    print(f"🔐 get_current_user: payload = {payload}")
     user = db.query(User).filter(User.id == payload["user_id"]).first()
+    print(f"🔐 get_current_user: 找到用户 = {user}")
     return user
 
 
@@ -470,20 +476,19 @@ def get_boards(
     user: Optional[User] = Depends(get_current_user), db: Session = Depends(get_db)
 ):
     """获取当前用户的所有未删除看板"""
+    # 调试日志
+    print(f"🔍 GET /boards - user: {user}, user_id: {user.id if user else None}")
+    
     if user:
-        return (
-            db.query(Board)
-            .filter(Board.user_id == user.id, Board.is_deleted.is_(False))
-            .all()
-        )
+        boards = db.query(Board).filter(Board.user_id == user.id, Board.is_deleted.is_(False)).all()
+        print(f"📋 返回用户 {user.id} 的看板: {[b.id for b in boards]}")
+        return boards
     else:
         # 未登录用户，返回无归属的看板（兼容旧数据）
         init_boards(db)
-        return (
-            db.query(Board)
-            .filter(Board.user_id.is_(None), Board.is_deleted.is_(False))
-            .all()
-        )
+        boards = db.query(Board).filter(Board.user_id.is_(None), Board.is_deleted.is_(False)).all()
+        print(f"📋 返回公共看板: {[b.id for b in boards]}")
+        return boards
 
 
 @app.get("/boards/deleted/list", response_model=List[BoardResponse])
