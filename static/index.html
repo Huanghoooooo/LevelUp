@@ -1074,6 +1074,473 @@
                 font-size: 14px;
             }
         }
+
+        /* ==================== 登录注册页面 ==================== */
+        .auth-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .auth-page.hidden {
+            display: none;
+        }
+
+        .auth-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            width: 90%;
+            max-width: 420px;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3);
+        }
+
+        .auth-logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .auth-logo-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+        }
+
+        .auth-logo-icon svg {
+            width: 36px;
+            height: 36px;
+            stroke: white;
+        }
+
+        .auth-logo-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .auth-logo-subtitle {
+            font-size: 14px;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 25px;
+            background: #f5f5f5;
+            border-radius: 10px;
+            padding: 4px;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: transparent;
+            font-size: 15px;
+            font-weight: 600;
+            color: #666;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .auth-tab.active {
+            background: white;
+            color: #22c55e;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+        }
+
+        .auth-field {
+            margin-bottom: 20px;
+        }
+
+        .auth-field label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 8px;
+        }
+
+        .auth-field input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 15px;
+            transition: border-color 0.3s;
+        }
+
+        .auth-field input:focus {
+            outline: none;
+            border-color: #22c55e;
+        }
+
+        .auth-submit {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .auth-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(34, 197, 94, 0.4);
+        }
+
+        .auth-submit:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .auth-error {
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .auth-error.show {
+            display: block;
+        }
+
+        .auth-skip {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .auth-skip button {
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .auth-skip button:hover {
+            color: #666;
+        }
+
+        /* ==================== 用户头像按钮 ==================== */
+        .user-avatar-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 10px;
+            overflow: hidden;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .user-avatar-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4);
+        }
+
+        .user-avatar-btn img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-avatar-btn .avatar-placeholder {
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .user-avatar-btn.no-user {
+            background: #e0e0e0;
+        }
+
+        .user-avatar-btn.no-user .avatar-placeholder {
+            color: #888;
+        }
+
+        /* ==================== 用户设置弹窗 ==================== */
+        .user-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 4000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .user-modal.active {
+            display: flex;
+        }
+
+        .user-panel {
+            background: white;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 450px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3);
+        }
+
+        .user-header {
+            padding: 25px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+            position: relative;
+        }
+
+        .user-header-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: #f5f5f5;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            color: #666;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .user-header-close:hover {
+            background: #ef4444;
+            color: white;
+        }
+
+        .user-avatar-large {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .user-avatar-large:hover {
+            transform: scale(1.05);
+        }
+
+        .user-avatar-large img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-avatar-large .avatar-placeholder {
+            color: white;
+            font-size: 32px;
+            font-weight: 600;
+        }
+
+        .user-avatar-large .avatar-edit-hint {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            font-size: 10px;
+            padding: 4px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .user-avatar-large:hover .avatar-edit-hint {
+            opacity: 1;
+        }
+
+        .user-nickname {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .user-email {
+            font-size: 14px;
+            color: #888;
+        }
+
+        .user-body {
+            padding: 20px 25px;
+        }
+
+        .user-section {
+            margin-bottom: 20px;
+        }
+
+        .user-section-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #888;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .user-field {
+            margin-bottom: 15px;
+        }
+
+        .user-field label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 6px;
+        }
+
+        .user-field input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .user-field input:focus {
+            outline: none;
+            border-color: #22c55e;
+        }
+
+        .user-btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 10px;
+        }
+
+        .user-btn-primary {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            color: white;
+        }
+
+        .user-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(34, 197, 94, 0.4);
+        }
+
+        .user-btn-secondary {
+            background: #f5f5f5;
+            color: #666;
+        }
+
+        .user-btn-secondary:hover {
+            background: #e8e8e8;
+        }
+
+        .user-btn-danger {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .user-btn-danger:hover {
+            background: #ef4444;
+            color: white;
+        }
+
+        .user-message {
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .user-message.success {
+            display: block;
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .user-message.error {
+            display: block;
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        /* 隐藏文件输入 */
+        .hidden-input {
+            display: none;
+        }
+
+        /* 登录提示按钮样式 */
+        .login-prompt-btn {
+            background: transparent;
+            border: 2px solid #22c55e;
+            color: #22c55e;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: all 0.3s;
+        }
+
+        .login-prompt-btn:hover {
+            background: #22c55e;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -1094,6 +1561,10 @@
                     <line x1="4" y1="18" x2="20" y2="18"></line>
                 </svg>
             </button>
+            <!-- 用户头像按钮 -->
+            <button class="user-avatar-btn" id="user-avatar-btn" onclick="handleUserClick()" title="用户">
+                <span class="avatar-placeholder" id="avatar-placeholder">?</span>
+            </button>
         </div>
     </nav>
 
@@ -1108,6 +1579,389 @@
         let charts = {};
         let currentPageIndex = 0;
         let newDimensions = []; // 新建看板时的维度列表
+
+        // ==================== 用户认证状态 ====================
+        let currentUser = null;
+        let authToken = localStorage.getItem('auth_token');
+
+        // 获取认证请求头
+        function getAuthHeaders() {
+            const headers = { 'Content-Type': 'application/json' };
+            if (authToken) {
+                headers['Authorization'] = `Bearer ${authToken}`;
+            }
+            return headers;
+        }
+
+        // ==================== 认证相关函数 ====================
+        
+        // 切换登录/注册标签
+        function switchAuthTab(tab) {
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+            
+            if (tab === 'login') {
+                document.querySelector('.auth-tab:first-child').classList.add('active');
+                document.getElementById('login-form').classList.add('active');
+            } else {
+                document.querySelector('.auth-tab:last-child').classList.add('active');
+                document.getElementById('register-form').classList.add('active');
+            }
+            hideAuthError();
+        }
+
+        // 显示认证错误
+        function showAuthError(message) {
+            const errorEl = document.getElementById('auth-error');
+            errorEl.textContent = message;
+            errorEl.classList.add('show');
+        }
+
+        // 隐藏认证错误
+        function hideAuthError() {
+            document.getElementById('auth-error').classList.remove('show');
+        }
+
+        // 处理登录
+        async function handleLogin(event) {
+            event.preventDefault();
+            hideAuthError();
+            
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const btn = document.getElementById('login-btn');
+            
+            btn.disabled = true;
+            btn.textContent = '登录中...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || '登录失败');
+                }
+                
+                const data = await response.json();
+                authToken = data.access_token;
+                currentUser = data.user;
+                localStorage.setItem('auth_token', authToken);
+                
+                hideAuthPage();
+                updateUserUI();
+                await reloadApp();
+            } catch (error) {
+                showAuthError(error.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '登录';
+            }
+        }
+
+        // 处理注册
+        async function handleRegister(event) {
+            event.preventDefault();
+            hideAuthError();
+            
+            const email = document.getElementById('register-email').value;
+            const nickname = document.getElementById('register-nickname').value;
+            const password = document.getElementById('register-password').value;
+            const confirm = document.getElementById('register-confirm').value;
+            const btn = document.getElementById('register-btn');
+            
+            if (password !== confirm) {
+                showAuthError('两次输入的密码不一致');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showAuthError('密码长度至少6位');
+                return;
+            }
+            
+            btn.disabled = true;
+            btn.textContent = '注册中...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password, nickname: nickname || '用户' })
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || '注册失败');
+                }
+                
+                const data = await response.json();
+                authToken = data.access_token;
+                currentUser = data.user;
+                localStorage.setItem('auth_token', authToken);
+                
+                hideAuthPage();
+                updateUserUI();
+                await reloadApp();
+            } catch (error) {
+                showAuthError(error.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '注册';
+            }
+        }
+
+        // 跳过认证
+        function skipAuth() {
+            localStorage.setItem('skipped_auth', 'true');
+            hideAuthPage();
+            updateUserUI();
+        }
+
+        // 显示认证页面
+        function showAuthPage() {
+            document.getElementById('auth-page').classList.remove('hidden');
+        }
+
+        // 隐藏认证页面
+        function hideAuthPage() {
+            document.getElementById('auth-page').classList.add('hidden');
+        }
+
+        // 检查认证状态
+        async function checkAuth() {
+            // 如果有 token，验证其有效性
+            if (authToken) {
+                try {
+                    const response = await fetch(`${API_BASE}/auth/me`, {
+                        headers: getAuthHeaders()
+                    });
+                    
+                    if (response.ok) {
+                        currentUser = await response.json();
+                        hideAuthPage();
+                        updateUserUI();
+                        return true;
+                    } else {
+                        // token 无效，清除
+                        authToken = null;
+                        currentUser = null;
+                        localStorage.removeItem('auth_token');
+                    }
+                } catch (error) {
+                    console.error('验证 token 失败:', error);
+                }
+            }
+            
+            // 检查是否之前跳过了认证
+            if (localStorage.getItem('skipped_auth')) {
+                hideAuthPage();
+                updateUserUI();
+                return true;
+            }
+            
+            // 显示认证页面
+            showAuthPage();
+            return false;
+        }
+
+        // 更新用户界面
+        function updateUserUI() {
+            const avatarBtn = document.getElementById('user-avatar-btn');
+            const avatarPlaceholder = document.getElementById('avatar-placeholder');
+            const userAvatarPlaceholder = document.getElementById('user-avatar-placeholder');
+            const userNicknameDisplay = document.getElementById('user-nickname-display');
+            const userEmailDisplay = document.getElementById('user-email-display');
+            const loggedInSection = document.getElementById('user-logged-in');
+            const notLoggedInSection = document.getElementById('user-not-logged-in');
+            
+            if (currentUser) {
+                // 已登录
+                avatarBtn.classList.remove('no-user');
+                const initial = currentUser.nickname ? currentUser.nickname.charAt(0).toUpperCase() : '?';
+                
+                if (currentUser.avatar) {
+                    avatarPlaceholder.innerHTML = `<img src="${currentUser.avatar}" alt="头像">`;
+                    userAvatarPlaceholder.innerHTML = `<img src="${currentUser.avatar}" alt="头像">`;
+                } else {
+                    avatarPlaceholder.textContent = initial;
+                    userAvatarPlaceholder.textContent = initial;
+                }
+                
+                userNicknameDisplay.textContent = currentUser.nickname || '用户';
+                userEmailDisplay.textContent = currentUser.email;
+                document.getElementById('edit-nickname').value = currentUser.nickname || '';
+                
+                loggedInSection.style.display = 'block';
+                notLoggedInSection.style.display = 'none';
+            } else {
+                // 未登录
+                avatarBtn.classList.add('no-user');
+                avatarPlaceholder.textContent = '?';
+                userAvatarPlaceholder.textContent = '?';
+                userNicknameDisplay.textContent = '游客';
+                userEmailDisplay.textContent = '未登录';
+                
+                loggedInSection.style.display = 'none';
+                notLoggedInSection.style.display = 'block';
+            }
+        }
+
+        // 处理用户按钮点击
+        function handleUserClick() {
+            openUserModal();
+        }
+
+        // 打开用户弹窗
+        function openUserModal() {
+            document.getElementById('user-modal').classList.add('active');
+            hideUserMessage();
+        }
+
+        // 关闭用户弹窗
+        function closeUserModal() {
+            document.getElementById('user-modal').classList.remove('active');
+        }
+
+        // 显示用户消息
+        function showUserMessage(message, type = 'success') {
+            const msgEl = document.getElementById('user-message');
+            msgEl.textContent = message;
+            msgEl.className = `user-message ${type}`;
+        }
+
+        // 隐藏用户消息
+        function hideUserMessage() {
+            document.getElementById('user-message').className = 'user-message';
+        }
+
+        // 触发头像上传
+        function triggerAvatarUpload() {
+            if (!currentUser) return;
+            document.getElementById('avatar-input').click();
+        }
+
+        // 处理头像更改
+        async function handleAvatarChange(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            // 检查文件大小（限制 2MB）
+            if (file.size > 2 * 1024 * 1024) {
+                showUserMessage('图片大小不能超过 2MB', 'error');
+                return;
+            }
+            
+            // 转换为 base64
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                const base64 = e.target.result;
+                
+                try {
+                    const response = await fetch(`${API_BASE}/auth/me`, {
+                        method: 'PUT',
+                        headers: getAuthHeaders(),
+                        body: JSON.stringify({ avatar: base64 })
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('更新头像失败');
+                    }
+                    
+                    currentUser = await response.json();
+                    updateUserUI();
+                    showUserMessage('头像更新成功');
+                } catch (error) {
+                    showUserMessage(error.message, 'error');
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // 更新昵称
+        async function updateNickname() {
+            const nickname = document.getElementById('edit-nickname').value.trim();
+            if (!nickname) {
+                showUserMessage('请输入昵称', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/auth/me`, {
+                    method: 'PUT',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify({ nickname })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('更新失败');
+                }
+                
+                currentUser = await response.json();
+                updateUserUI();
+                showUserMessage('昵称更新成功');
+            } catch (error) {
+                showUserMessage(error.message, 'error');
+            }
+        }
+
+        // 修改密码
+        async function changePassword() {
+            const oldPassword = document.getElementById('old-password').value;
+            const newPassword = document.getElementById('new-password').value;
+            
+            if (!oldPassword || !newPassword) {
+                showUserMessage('请填写完整', 'error');
+                return;
+            }
+            
+            if (newPassword.length < 6) {
+                showUserMessage('新密码长度至少6位', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/auth/password`, {
+                    method: 'PUT',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify({ 
+                        old_password: oldPassword, 
+                        new_password: newPassword 
+                    })
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || '修改失败');
+                }
+                
+                document.getElementById('old-password').value = '';
+                document.getElementById('new-password').value = '';
+                showUserMessage('密码修改成功');
+            } catch (error) {
+                showUserMessage(error.message, 'error');
+            }
+        }
+
+        // 退出登录
+        function logout() {
+            if (!confirm('确定要退出登录吗？')) return;
+            
+            authToken = null;
+            currentUser = null;
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('skipped_auth');
+            
+            closeUserModal();
+            showAuthPage();
+            updateUserUI();
+            
+            // 重新加载应用以显示游客数据
+            reloadApp();
+        }
 
         // 页面切换函数
         function switchPage(pageIndex) {
@@ -1230,8 +2084,13 @@
         // 初始化应用
         async function init() {
             try {
+                // 首先检查认证状态
+                await checkAuth();
+                
                 // 加载看板列表
-                const response = await fetch(`${API_BASE}/boards`);
+                const response = await fetch(`${API_BASE}/boards`, {
+                    headers: getAuthHeaders()
+                });
                 boards = await response.json();
                 
                 // 渲染导航和页面
@@ -1489,9 +2348,7 @@
 
                 const response = await fetch(`${API_BASE}/records`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: getAuthHeaders(),
                     body: JSON.stringify(recordData)
                 });
 
@@ -1513,7 +2370,9 @@
         // 更新雷达图（同时更新本周和上周数据）
         async function updateChart(boardId, boardPrefix) {
             try {
-                const stats = await fetch(`${API_BASE}/boards/${boardId}/weekly-stats`).then(r => r.json());
+                const stats = await fetch(`${API_BASE}/boards/${boardId}/weekly-stats`, {
+                    headers: getAuthHeaders()
+                }).then(r => r.json());
                 if (charts[boardId]) {
                     // 本周数据
                     charts[boardId].data.datasets[0].data = stats.averages ? 
@@ -1533,7 +2392,9 @@
         // 加载每周统计
         async function loadWeeklyStats(boardId, boardPrefix) {
             try {
-                const response = await fetch(`${API_BASE}/boards/${boardId}/weekly-stats`);
+                const response = await fetch(`${API_BASE}/boards/${boardId}/weekly-stats`, {
+                    headers: getAuthHeaders()
+                });
                 const stats = await response.json();
 
                 // 更新图表（本周 + 上周）
@@ -1585,7 +2446,9 @@
         // 加载历史记录
         async function loadRecords(boardId, boardPrefix) {
             try {
-                const response = await fetch(`${API_BASE}/records?board_id=${boardId}`);
+                const response = await fetch(`${API_BASE}/records?board_id=${boardId}`, {
+                    headers: getAuthHeaders()
+                });
                 const records = await response.json();
 
                 const recordsContainer = document.getElementById(`records-${boardPrefix}`);
@@ -1630,7 +2493,8 @@
 
             try {
                 const response = await fetch(`${API_BASE}/records/${recordId}`, {
-                    method: 'DELETE'
+                    method: 'DELETE',
+                    headers: getAuthHeaders()
                 });
 
                 if (response.ok) {
@@ -1735,7 +2599,9 @@
         // 显示维度历史折线图
         async function showDimensionHistory(boardId, dimension) {
             try {
-                const response = await fetch(`${API_BASE}/boards/${boardId}/dimension-history?dimension=${encodeURIComponent(dimension)}&weeks=8`);
+                const response = await fetch(`${API_BASE}/boards/${boardId}/dimension-history?dimension=${encodeURIComponent(dimension)}&weeks=8`, {
+                    headers: getAuthHeaders()
+                });
                 const data = await response.json();
 
                 // 显示模态框
@@ -1886,7 +2752,9 @@
             list.innerHTML = '<div class="loading">加载中...</div>';
             
             try {
-                const response = await fetch(`${API_BASE}/boards`);
+                const response = await fetch(`${API_BASE}/boards`, {
+                    headers: getAuthHeaders()
+                });
                 const activeBoards = await response.json();
                 
                 if (activeBoards.length === 0) {
@@ -1926,7 +2794,9 @@
             list.innerHTML = '<div class="loading">加载中...</div>';
             
             try {
-                const response = await fetch(`${API_BASE}/boards/deleted/list`);
+                const response = await fetch(`${API_BASE}/boards/deleted/list`, {
+                    headers: getAuthHeaders()
+                });
                 const deletedBoards = await response.json();
                 
                 if (deletedBoards.length === 0) {
@@ -1971,7 +2841,8 @@
             
             try {
                 const response = await fetch(`${API_BASE}/boards/${boardId}`, {
-                    method: 'DELETE'
+                    method: 'DELETE',
+                    headers: getAuthHeaders()
                 });
                 
                 if (response.ok) {
@@ -1991,7 +2862,8 @@
         async function restoreBoard(boardId) {
             try {
                 const response = await fetch(`${API_BASE}/boards/${boardId}/restore`, {
-                    method: 'POST'
+                    method: 'POST',
+                    headers: getAuthHeaders()
                 });
                 
                 if (response.ok) {
@@ -2014,7 +2886,8 @@
             
             try {
                 const response = await fetch(`${API_BASE}/boards/${boardId}/permanent`, {
-                    method: 'DELETE'
+                    method: 'DELETE',
+                    headers: getAuthHeaders()
                 });
                 
                 if (response.ok) {
@@ -2106,9 +2979,7 @@
             try {
                 const response = await fetch(`${API_BASE}/boards`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: getAuthHeaders(),
                     body: JSON.stringify({
                         name: name,
                         dimensions: newDimensions
@@ -2147,7 +3018,9 @@
                 charts = {};
                 
                 // 重新加载看板列表
-                const response = await fetch(`${API_BASE}/boards`);
+                const response = await fetch(`${API_BASE}/boards`, {
+                    headers: getAuthHeaders()
+                });
                 boards = await response.json();
                 
                 // 重新渲染
@@ -2173,6 +3046,9 @@
         document.addEventListener('click', function(e) {
             if (e.target.id === 'manage-modal') {
                 closeManagePanel();
+            }
+            if (e.target.id === 'user-modal') {
+                closeUserModal();
             }
         });
 
@@ -2239,6 +3115,126 @@
             <div class="manage-section" id="manage-deleted">
                 <div class="board-list" id="deleted-boards-list">
                     <!-- 动态生成 -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 登录注册页面 -->
+<div class="auth-page" id="auth-page">
+    <div class="auth-container">
+        <div class="auth-logo">
+            <div class="auth-logo-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                    <path d="M2 17l10 5 10-5"></path>
+                    <path d="M2 12l10 5 10-5"></path>
+                </svg>
+            </div>
+            <div class="auth-logo-title">多维度追踪看板</div>
+            <div class="auth-logo-subtitle">记录成长，追踪进步</div>
+        </div>
+
+        <div class="auth-tabs">
+            <button class="auth-tab active" onclick="switchAuthTab('login')">登录</button>
+            <button class="auth-tab" onclick="switchAuthTab('register')">注册</button>
+        </div>
+
+        <div class="auth-error" id="auth-error"></div>
+
+        <!-- 登录表单 -->
+        <form class="auth-form active" id="login-form" onsubmit="handleLogin(event)">
+            <div class="auth-field">
+                <label>邮箱</label>
+                <input type="email" id="login-email" placeholder="请输入邮箱" required>
+            </div>
+            <div class="auth-field">
+                <label>密码</label>
+                <input type="password" id="login-password" placeholder="请输入密码" required>
+            </div>
+            <button type="submit" class="auth-submit" id="login-btn">登录</button>
+        </form>
+
+        <!-- 注册表单 -->
+        <form class="auth-form" id="register-form" onsubmit="handleRegister(event)">
+            <div class="auth-field">
+                <label>邮箱</label>
+                <input type="email" id="register-email" placeholder="请输入邮箱" required>
+            </div>
+            <div class="auth-field">
+                <label>昵称</label>
+                <input type="text" id="register-nickname" placeholder="请输入昵称（可选）">
+            </div>
+            <div class="auth-field">
+                <label>密码</label>
+                <input type="password" id="register-password" placeholder="至少6位密码" required minlength="6">
+            </div>
+            <div class="auth-field">
+                <label>确认密码</label>
+                <input type="password" id="register-confirm" placeholder="请再次输入密码" required>
+            </div>
+            <button type="submit" class="auth-submit" id="register-btn">注册</button>
+        </form>
+
+        <div class="auth-skip">
+            <button type="button" onclick="skipAuth()">暂不登录，直接体验</button>
+        </div>
+    </div>
+</div>
+
+<!-- 用户设置弹窗 -->
+<div class="user-modal" id="user-modal">
+    <div class="user-panel">
+        <div class="user-header">
+            <button class="user-header-close" onclick="closeUserModal()">&times;</button>
+            <div class="user-avatar-large" onclick="triggerAvatarUpload()" title="点击更换头像">
+                <span class="avatar-placeholder" id="user-avatar-placeholder">?</span>
+                <div class="avatar-edit-hint">更换</div>
+            </div>
+            <input type="file" id="avatar-input" class="hidden-input" accept="image/*" onchange="handleAvatarChange(event)">
+            <div class="user-nickname" id="user-nickname-display">用户</div>
+            <div class="user-email" id="user-email-display">未登录</div>
+        </div>
+
+        <div class="user-body">
+            <div id="user-message" class="user-message"></div>
+
+            <!-- 已登录状态 -->
+            <div id="user-logged-in" style="display: none;">
+                <div class="user-section">
+                    <div class="user-section-title">个人信息</div>
+                    <div class="user-field">
+                        <label>昵称</label>
+                        <input type="text" id="edit-nickname" placeholder="输入昵称">
+                    </div>
+                    <button class="user-btn user-btn-primary" onclick="updateNickname()">保存昵称</button>
+                </div>
+
+                <div class="user-section">
+                    <div class="user-section-title">修改密码</div>
+                    <div class="user-field">
+                        <label>原密码</label>
+                        <input type="password" id="old-password" placeholder="输入原密码">
+                    </div>
+                    <div class="user-field">
+                        <label>新密码</label>
+                        <input type="password" id="new-password" placeholder="输入新密码（至少6位）">
+                    </div>
+                    <button class="user-btn user-btn-secondary" onclick="changePassword()">修改密码</button>
+                </div>
+
+                <div class="user-section">
+                    <div class="user-section-title">账户操作</div>
+                    <button class="user-btn user-btn-danger" onclick="logout()">退出登录</button>
+                </div>
+            </div>
+
+            <!-- 未登录状态 -->
+            <div id="user-not-logged-in" style="display: block;">
+                <div style="text-align: center; padding: 20px;">
+                    <p style="color: #888; margin-bottom: 20px;">登录后可同步您的数据</p>
+                    <button class="user-btn user-btn-primary" onclick="closeUserModal(); showAuthPage();">登录 / 注册</button>
                 </div>
             </div>
         </div>
