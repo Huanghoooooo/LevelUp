@@ -23,7 +23,12 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
 # ==================== 配置 ====================
-JWT_SECRET = secrets.token_hex(32)  # 生产环境应使用环境变量
+import os
+
+# JWT 密钥：优先使用环境变量，否则使用固定值（生产环境建议设置环境变量）
+JWT_SECRET = os.environ.get(
+    "JWT_SECRET", "levelup_default_secret_key_change_in_production"
+)
 JWT_ALGORITHM = "HS256"
 JWT_EXPIRATION_HOURS = 24 * 7  # 7天有效期
 
