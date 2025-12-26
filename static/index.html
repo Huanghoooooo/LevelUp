@@ -1714,13 +1714,6 @@
             }
         }
 
-        // 跳过认证
-        function skipAuth() {
-            localStorage.setItem('skipped_auth', 'true');
-            hideAuthPage();
-            updateUserUI();
-        }
-
         // 显示认证页面
         function showAuthPage() {
             document.getElementById('auth-page').classList.remove('hidden');
@@ -1733,6 +1726,9 @@
 
         // 检查认证状态
         async function checkAuth() {
+            // 清除之前的跳过认证状态（不再支持游客模式）
+            localStorage.removeItem('skipped_auth');
+            
             // 如果有 token，验证其有效性
             if (authToken) {
                 try {
@@ -1756,14 +1752,7 @@
                 }
             }
             
-            // 检查是否之前跳过了认证
-            if (localStorage.getItem('skipped_auth')) {
-                hideAuthPage();
-                updateUserUI();
-                return true;
-            }
-            
-            // 显示认证页面
+            // 未登录，必须显示认证页面
             showAuthPage();
             return false;
         }
@@ -3177,9 +3166,6 @@
             <button type="submit" class="auth-submit" id="register-btn">注册</button>
         </form>
 
-        <div class="auth-skip">
-            <button type="button" onclick="skipAuth()">暂不登录，直接体验</button>
-        </div>
     </div>
 </div>
 
