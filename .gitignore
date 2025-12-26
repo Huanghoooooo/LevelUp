@@ -15,8 +15,8 @@ ENV/
 *.swo
 
 # Database (本地开发用，部署时会重新创建)
-# 如果要保留数据，注释掉下面这行
-# kanban.db
+kanban.db
+*.db
 
 # OS
 .DS_Store
