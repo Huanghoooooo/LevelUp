@@ -434,9 +434,7 @@ def init_boards_for_user(db: Session, user_id: int):
 
 
 @app.get("/boards", response_model=List[BoardResponse])
-def get_boards(
-    user: User = Depends(require_user), db: Session = Depends(get_db)
-):
+def get_boards(user: User = Depends(require_user), db: Session = Depends(get_db)):
     """获取当前用户的所有未删除看板（必须登录）"""
     return (
         db.query(Board)
@@ -464,7 +462,9 @@ def get_board(
     db: Session = Depends(get_db),
 ):
     """获取单个看板信息（必须登录）"""
-    board = db.query(Board).filter(Board.id == board_id, Board.user_id == user.id).first()
+    board = (
+        db.query(Board).filter(Board.id == board_id, Board.user_id == user.id).first()
+    )
     if not board:
         raise HTTPException(status_code=404, detail="看板不存在或无权访问")
     return board
@@ -510,7 +510,9 @@ def delete_board(
     db: Session = Depends(get_db),
 ):
     """软删除看板（必须登录）"""
-    board = db.query(Board).filter(Board.id == board_id, Board.user_id == user.id).first()
+    board = (
+        db.query(Board).filter(Board.id == board_id, Board.user_id == user.id).first()
+    )
     if not board:
         raise HTTPException(status_code=404, detail="看板不存在或无权操作")
 
@@ -530,7 +532,9 @@ def restore_board(
     db: Session = Depends(get_db),
 ):
     """恢复已删除的看板（必须登录）"""
-    board = db.query(Board).filter(Board.id == board_id, Board.user_id == user.id).first()
+    board = (
+        db.query(Board).filter(Board.id == board_id, Board.user_id == user.id).first()
+    )
     if not board:
         raise HTTPException(status_code=404, detail="看板不存在或无权操作")
 
@@ -550,7 +554,9 @@ def permanent_delete_board(
     db: Session = Depends(get_db),
 ):
     """永久删除看板及其所有记录（必须登录）"""
-    board = db.query(Board).filter(Board.id == board_id, Board.user_id == user.id).first()
+    board = (
+        db.query(Board).filter(Board.id == board_id, Board.user_id == user.id).first()
+    )
     if not board:
         raise HTTPException(status_code=404, detail="看板不存在或无权操作")
 
@@ -570,7 +576,11 @@ def create_record(
 ):
     """创建每日记录（必须登录）"""
     # 验证看板是否存在且属于当前用户
-    board = db.query(Board).filter(Board.id == record.board_id, Board.user_id == user.id).first()
+    board = (
+        db.query(Board)
+        .filter(Board.id == record.board_id, Board.user_id == user.id)
+        .first()
+    )
     if not board:
         raise HTTPException(status_code=404, detail="看板不存在或无权操作")
 
@@ -613,8 +623,10 @@ def get_records(
 ):
     """获取记录列表（必须登录）"""
     # 获取用户的所有看板 ID
-    user_board_ids = [b.id for b in db.query(Board).filter(Board.user_id == user.id).all()]
-    
+    user_board_ids = [
+        b.id for b in db.query(Board).filter(Board.user_id == user.id).all()
+    ]
+
     query = db.query(DailyRecord).filter(DailyRecord.board_id.in_(user_board_ids))
 
     if board_id:
@@ -641,12 +653,16 @@ def get_record(
     record = db.query(DailyRecord).filter(DailyRecord.id == record_id).first()
     if not record:
         raise HTTPException(status_code=404, detail="记录不存在")
-    
+
     # 检查记录所属的看板是否属于当前用户
-    board = db.query(Board).filter(Board.id == record.board_id, Board.user_id == user.id).first()
+    board = (
+        db.query(Board)
+        .filter(Board.id == record.board_id, Board.user_id == user.id)
+        .first()
+    )
     if not board:
         raise HTTPException(status_code=403, detail="无权访问此记录")
-    
+
     return record
 
 
@@ -662,7 +678,11 @@ def delete_record(
         raise HTTPException(status_code=404, detail="记录不存在")
 
     # 检查记录所属的看板是否属于当前用户
-    board = db.query(Board).filter(Board.id == record.board_id, Board.user_id == user.id).first()
+    board = (
+        db.query(Board)
+        .filter(Board.id == record.board_id, Board.user_id == user.id)
+        .first()
+    )
     if not board:
         raise HTTPException(status_code=403, detail="无权操作此记录")
 
@@ -680,7 +700,9 @@ def get_weekly_stats(
 ):
     """获取每周统计数据（必须登录）"""
     # 验证看板是否存在且属于当前用户
-    board = db.query(Board).filter(Board.id == board_id, Board.user_id == user.id).first()
+    board = (
+        db.query(Board).filter(Board.id == board_id, Board.user_id == user.id).first()
+    )
     if not board:
         raise HTTPException(status_code=404, detail="看板不存在或无权访问")
 
@@ -780,7 +802,9 @@ def get_dimension_history(
     db: Session = Depends(get_db),
 ):
     """获取某个维度的周平均值历史数据（必须登录）"""
-    board = db.query(Board).filter(Board.id == board_id, Board.user_id == user.id).first()
+    board = (
+        db.query(Board).filter(Board.id == board_id, Board.user_id == user.id).first()
+    )
     if not board:
         raise HTTPException(status_code=404, detail="看板不存在或无权访问")
 
