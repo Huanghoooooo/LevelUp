@@ -115,16 +115,24 @@ def create_token(user_id: int) -> str:
         "exp": now + timedelta(hours=JWT_EXPIRATION_HOURS),
         "iat": now,
     }
-    return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
+    print(f"🔑 create_token: 使用 JWT_SECRET = {JWT_SECRET[:20]}...")
+    token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
+    print(f"🔑 create_token: 生成 token = {token[:30]}...")
+    return token
 
 
 def decode_token(token: str) -> Optional[dict]:
     """解码JWT令牌"""
     try:
-        return jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
-    except jwt.ExpiredSignatureError:
+        print(f"🔑 decode_token: 使用 JWT_SECRET = {JWT_SECRET[:20]}...")
+        result = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        print(f"🔑 decode_token: 解码成功 = {result}")
+        return result
+    except jwt.ExpiredSignatureError as e:
+        print(f"🔑 decode_token: Token 已过期 - {e}")
         return None
-    except jwt.InvalidTokenError:
+    except jwt.InvalidTokenError as e:
+        print(f"🔑 decode_token: Token 无效 - {e}")
         return None
 
 
@@ -227,7 +235,7 @@ async def get_current_user(
 
     token = credentials.credentials
     print(f"🔐 get_current_user: 收到 token: {token[:20]}...")
-    
+
     payload = decode_token(token)
     if payload is None:
         print("🔐 get_current_user: token 解码失败")
@@ -478,15 +486,23 @@ def get_boards(
     """获取当前用户的所有未删除看板"""
     # 调试日志
     print(f"🔍 GET /boards - user: {user}, user_id: {user.id if user else None}")
-    
+
     if user:
-        boards = db.query(Board).filter(Board.user_id == user.id, Board.is_deleted.is_(False)).all()
+        boards = (
+            db.query(Board)
+            .filter(Board.user_id == user.id, Board.is_deleted.is_(False))
+            .all()
+        )
         print(f"📋 返回用户 {user.id} 的看板: {[b.id for b in boards]}")
         return boards
     else:
         # 未登录用户，返回无归属的看板（兼容旧数据）
         init_boards(db)
-        boards = db.query(Board).filter(Board.user_id.is_(None), Board.is_deleted.is_(False)).all()
+        boards = (
+            db.query(Board)
+            .filter(Board.user_id.is_(None), Board.is_deleted.is_(False))
+            .all()
+        )
         print(f"📋 返回公共看板: {[b.id for b in boards]}")
         return boards
 
